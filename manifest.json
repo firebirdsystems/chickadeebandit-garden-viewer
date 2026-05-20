@@ -1,0 +1,30 @@
+{
+  "id": "garden-viewer",
+  "name": "Map My Garden",
+  "version": "1.1.0",
+  "description": "Browse your household gardens and plants. Add and manage plants from the Map My Garden iOS app — this viewer keeps everyone in the family in sync.",
+  "entrypoint": "index.html",
+  "runtime": "static",
+  "storage": "db",
+  "category": "family",
+  "tags": ["garden", "plants", "nature", "outdoor"],
+  "nav": { "label": "Garden", "icon": "🌿" },
+  "widget": { "label": "Garden", "size": "small" },
+  "data_access": {
+    "reads": ["family.members"],
+    "writes": []
+  },
+  "permissions": {
+    "default_audience": "everyone",
+    "requires_approval": false
+  },
+  "cdn_whitelist": [
+    "https://unpkg.com",
+    "https://*.tile.openstreetmap.org"
+  ],
+  "resource_limits": {
+    "max_db_bytes": 52428800,
+    "max_file_bytes": 15728640,
+    "max_files_bytes": 524288000
+  }
+}

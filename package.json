@@ -1,0 +1,10 @@
+{
+  "name": "chickadee-app-garden-viewer",
+  "version": "1.0.0",
+  "description": "Map My Garden viewer app for Chickadee Bandit",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "license": "MIT"
+}

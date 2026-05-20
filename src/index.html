@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Map My Garden</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      var(--hub-bg, #f9fafb);
+      --card:    var(--hub-surface, #ffffff);
+      --border:  var(--hub-border, #e5e7eb);
+      --text:    var(--hub-text, #111827);
+      --muted:   var(--hub-text-muted, #6b7280);
+      --accent:  var(--hub-primary, #2d6a4f);
+      --accent-fg: var(--hub-primary-fg, #ffffff);
+      --radius:  var(--hub-radius, 0.5rem);
+      --green:   #2d6a4f;
+      --green-lt: #d1fae5;
+    }
+
+    body {
+      font-family: var(--hub-font, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-size: 15px;
+    }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--card);
+      flex-shrink: 0;
+    }
+    .garden-select {
+      flex: 1; border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 7px 10px; font-size: 0.9rem; background: var(--bg);
+      color: var(--text); outline: none; cursor: pointer;
+      max-width: 260px;
+    }
+    .view-tabs { display: flex; gap: 4px; margin-left: auto; }
+    .tab-btn {
+      padding: 6px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+      background: var(--bg); color: var(--muted); font-size: 0.85rem;
+      cursor: pointer; font-weight: 500; transition: all .15s;
+    }
+    .tab-btn.active {
+      background: var(--accent); border-color: var(--accent);
+      color: var(--accent-fg);
+    }
+
+    /* ── Search ── */
+    .search-bar {
+      padding: 8px 16px; border-bottom: 1px solid var(--border);
+      background: var(--card); flex-shrink: 0;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .search-input {
+      flex: 1; border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; font-size: 0.9rem; outline: none;
+      background: var(--bg); color: var(--text); transition: border-color .15s;
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .add-plant-btn {
+      flex-shrink: 0; padding: 7px 13px; border: 1.5px solid var(--accent);
+      border-radius: 8px; background: transparent; color: var(--accent);
+      font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: inherit;
+      white-space: nowrap; transition: background .12s, color .12s;
+    }
+    .add-plant-btn:hover { background: var(--accent); color: var(--accent-fg); }
+
+    /* ── Main area ── */
+    .main { flex: 1; display: flex; overflow: hidden; position: relative; }
+
+    /* ── Plants list ── */
+    .plant-list {
+      width: 320px; flex-shrink: 0;
+      overflow-y: auto; border-right: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .plant-list.full { width: 100%; border-right: none; }
+    .plant-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background .12s; background: var(--card);
+    }
+    .plant-item:hover { background: var(--bg); }
+    .plant-item.selected { background: var(--green-lt); }
+    .plant-thumb {
+      width: 52px; height: 52px; border-radius: 10px;
+      object-fit: cover; flex-shrink: 0; background: var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; overflow: hidden;
+    }
+    .plant-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .plant-info { flex: 1; min-width: 0; }
+    .plant-name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .plant-sci { font-size: 0.78rem; color: var(--muted); font-style: italic; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .plant-meta { font-size: 0.78rem; color: var(--muted); margin-top: 3px; }
+    .type-badge {
+      display: inline-block; font-size: 0.7rem; font-weight: 600;
+      padding: 2px 8px; border-radius: 20px;
+      background: var(--green-lt); color: var(--green);
+      text-transform: capitalize; flex-shrink: 0;
+    }
+
+    .empty-state {
+      padding: 48px 24px; text-align: center; color: var(--muted);
+    }
+    .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+    .empty-title { font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .empty-msg { font-size: 0.875rem; line-height: 1.5; }
+
+    /* ── Detail panel ── */
+    .detail-panel {
+      flex: 1; overflow-y: auto; background: var(--bg);
+    }
+    .detail-panel.hidden { display: none; }
+    .detail-photos {
+      width: 100%; height: 220px; overflow-x: auto;
+      display: flex; gap: 4px; background: #111;
+    }
+    .detail-photos img {
+      height: 100%; width: auto; object-fit: cover; flex-shrink: 0;
+    }
+    .detail-photos-empty {
+      width: 100%; height: 180px; display: flex;
+      align-items: center; justify-content: center;
+      background: var(--border); font-size: 3rem;
+    }
+    .detail-body { padding: 20px 24px; }
+    .detail-name { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+    .detail-sci { font-size: 0.95rem; color: var(--muted); font-style: italic; margin-bottom: 12px; }
+    .detail-row { margin-bottom: 16px; }
+    .detail-label {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--muted); margin-bottom: 4px;
+    }
+    .detail-value { font-size: 0.9rem; color: var(--text); line-height: 1.5; }
+    .detail-back {
+      display: none; padding: 10px 16px; border-bottom: 1px solid var(--border);
+      background: var(--card); cursor: pointer; font-size: 0.875rem;
+      color: var(--accent); font-weight: 500;
+    }
+
+    /* ── Map view ── */
+    #map { flex: 1; }
+    .map-view { flex: 1; display: none; position: relative; }
+    .map-view.active { display: flex; }
+
+    /* ── Floor plan view ── */
+    .floorplan-view {
+      flex: 1; display: none; position: relative;
+      overflow: hidden; background: #111;
+    }
+    .floorplan-view.active { display: flex; }
+    .floorplan-img { max-width: 100%; max-height: 100%; object-fit: contain; margin: auto; }
+    .floorplan-pin {
+      position: absolute; transform: translate(-50%, -100%);
+      cursor: grab; touch-action: none;
+    }
+    .floorplan-pin:active { cursor: grabbing; }
+    #floorplanContainer.placing { cursor: crosshair; }
+    .pin-bubble {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--accent); display: flex; align-items: center;
+      justify-content: center; font-size: 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,.3);
+      overflow: hidden;
+    }
+    .pin-bubble img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .pin-tail {
+      width: 0; height: 0; margin: -1px auto 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 10px solid var(--accent);
+    }
+
+    /* ── Upload progress ── */
+    .upload-bar {
+      padding: 10px 20px; background: var(--card);
+      border-bottom: 1px solid var(--border); font-size: 0.82rem; color: var(--muted);
+    }
+    .upload-track { height: 4px; background: var(--border); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+    .upload-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width .1s; }
+
+    /* ── Photo strip actions ── */
+    .photo-strip-wrap { position: relative; }
+    .photo-upload-btn {
+      position: absolute; bottom: 8px; right: 8px;
+      background: rgba(0,0,0,.6); color: #fff; border: none;
+      border-radius: 8px; padding: 6px 12px; font-size: 0.8rem;
+      cursor: pointer; font-family: inherit; font-weight: 600;
+      backdrop-filter: blur(4px);
+    }
+    .photo-upload-btn:hover { background: rgba(0,0,0,.8); }
+    .photo-del-btn {
+      position: absolute; top: 6px; right: 6px;
+      background: rgba(220,38,38,.85); color: #fff; border: none;
+      border-radius: 50%; width: 22px; height: 22px; font-size: 0.7rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── Placement banner ── */
+    .placement-banner {
+      position: relative; z-index: 20; flex-shrink: 0;
+      background: var(--accent); color: var(--accent-fg);
+      padding: 9px 16px; display: flex; align-items: center; gap: 10px;
+      font-size: 0.875rem; font-weight: 500;
+    }
+    .placement-banner.hidden { display: none; }
+    .placement-banner span { flex: 1; }
+    .btn-skip {
+      padding: 4px 11px; border: 1.5px solid rgba(255,255,255,.55);
+      border-radius: 6px; background: transparent; color: var(--accent-fg);
+      font-size: 0.8rem; cursor: pointer; font-family: inherit; font-weight: 600;
+    }
+
+    /* ── New Garden / Add Plant modals ── */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,.45);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .modal-backdrop.hidden { display: none; }
+    .modal {
+      background: var(--card); border-radius: 14px;
+      padding: 28px 28px 24px; width: 340px; max-width: calc(100vw - 32px);
+      box-shadow: 0 8px 32px rgba(0,0,0,.18);
+      max-height: calc(100vh - 48px); overflow-y: auto;
+    }
+    .modal.modal-lg { width: 420px; }
+    .modal textarea {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 8px 10px; font-size: 0.9rem; background: var(--bg);
+      color: var(--text); outline: none; margin-bottom: 16px;
+      font-family: inherit; resize: vertical; min-height: 72px;
+    }
+    .modal textarea:focus { border-color: var(--accent); }
+    .modal-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; }
+    .modal label { display: block; font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 5px; }
+    .modal input[type=text], .modal select {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 8px 10px; font-size: 0.9rem; background: var(--bg);
+      color: var(--text); outline: none; margin-bottom: 16px;
+      font-family: inherit;
+    }
+    .modal input[type=text]:focus, .modal select:focus { border-color: var(--accent); }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+    .btn-cancel {
+      padding: 8px 16px; border: 1.5px solid var(--border); border-radius: 8px;
+      background: var(--bg); color: var(--text); font-size: 0.875rem;
+      cursor: pointer; font-family: inherit; font-weight: 500;
+    }
+    .btn-create {
+      padding: 8px 18px; border: none; border-radius: 8px;
+      background: var(--accent); color: var(--accent-fg); font-size: 0.875rem;
+      cursor: pointer; font-family: inherit; font-weight: 600;
+    }
+    .btn-create:disabled { opacity: .5; cursor: default; }
+    .new-garden-btn {
+      padding: 6px 12px; border: 1.5px solid var(--accent); border-radius: 8px;
+      background: var(--accent); color: var(--accent-fg); font-size: 0.85rem;
+      cursor: pointer; font-family: inherit; font-weight: 600; flex-shrink: 0;
+    }
+
+    /* ── Loading ── */
+    .loading {
+      position: absolute; inset: 0; display: flex;
+      align-items: center; justify-content: center;
+      background: var(--bg); z-index: 10;
+    }
+    .spinner {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Responsive: mobile collapses list when detail is open ── */
+    @media (max-width: 600px) {
+      .plant-list { width: 100%; border-right: none; }
+      .plant-list.with-detail { display: none; }
+      .detail-back { display: block; }
+      .detail-panel { width: 100%; }
+    }
+  </style>
+<base href="/run/garden-viewer/">
+</head>
+<body>
+
+<div class="loading" id="loading"><div class="spinner"></div></div>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <span style="font-size:1.2rem">🌿</span>
+  <select class="garden-select" id="gardenSelect"></select>
+  <div class="view-tabs">
+    <button class="tab-btn active" id="tabList" onclick="setView('list')">List</button>
+    <button class="tab-btn" id="tabMap" onclick="setView('map')">Map</button>
+  </div>
+  <button class="new-garden-btn" id="newGardenBtn" style="display:none" onclick="openNewGardenModal()">+ New</button>
+</div>
+
+<!-- New Garden modal -->
+<div class="modal-backdrop hidden" id="newGardenModal">
+  <div class="modal">
+    <div class="modal-title">New Garden</div>
+    <label for="gardenNameInput">Name</label>
+    <input type="text" id="gardenNameInput" placeholder="e.g. Backyard" maxlength="80" oninput="updateCreateBtn()" />
+    <label for="gardenTypeInput">Type</label>
+    <select id="gardenTypeInput">
+      <option value="map">Map (GPS-pinned plants)</option>
+      <option value="image">Floor Plan (image-based layout)</option>
+    </select>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeNewGardenModal()">Cancel</button>
+      <button class="btn-create" id="createGardenBtn" disabled onclick="createGarden()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Placement banner -->
+<div class="placement-banner hidden" id="placementBanner">
+  <span>Tap the <span id="placementViewLabel">map</span> to place <strong id="placementPlantName"></strong></span>
+  <button class="btn-skip" onclick="exitPlacementMode()">Skip</button>
+</div>
+
+<!-- Search (list view only) -->
+<div class="search-bar" id="searchBar">
+  <input class="search-input" id="searchInput" placeholder="Search plants…" />
+  <button class="add-plant-btn" id="addPlantBtn" onclick="openAddPlantModal()">+ Add Plant</button>
+</div>
+
+<!-- Add Plant modal -->
+<div class="modal-backdrop hidden" id="addPlantModal">
+  <div class="modal modal-lg">
+    <div class="modal-title">Add Plant</div>
+    <label for="plantNameInput">Name *</label>
+    <input type="text" id="plantNameInput" placeholder="e.g. Tomato" maxlength="120" />
+    <label for="plantSciInput">Scientific Name</label>
+    <input type="text" id="plantSciInput" placeholder="e.g. Solanum lycopersicum" maxlength="120" />
+    <label for="plantTypeInput">Type</label>
+    <input type="text" id="plantTypeInput" placeholder="e.g. Annual, Perennial, Tree…" maxlength="60" />
+    <label for="plantBedInput">Bed / Zone</label>
+    <input type="text" id="plantBedInput" placeholder="e.g. Raised bed 1, Front border…" maxlength="80" />
+    <label for="plantNotesInput">Notes</label>
+    <textarea id="plantNotesInput" placeholder="Care tips, purchase date, …" rows="3"></textarea>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAddPlantModal()">Cancel</button>
+      <button class="btn-create" id="addPlantSubmitBtn" disabled onclick="submitAddPlant()">Add Plant</button>
+    </div>
+  </div>
+</div>
+
+<!-- Main content -->
+<div class="main" id="main">
+
+  <!-- Plants list -->
+  <div class="plant-list" id="plantList"></div>
+
+  <!-- Detail panel -->
+  <div class="detail-panel hidden" id="detailPanel">
+    <div class="detail-back" id="detailBack" onclick="closeDetail()">‹ Back to plants</div>
+    <div id="detailContent"></div>
+  </div>
+
+  <!-- Map view (Leaflet) -->
+  <div class="map-view" id="mapView">
+    <div id="map"></div>
+  </div>
+
+  <!-- Floor plan view -->
+  <div class="floorplan-view" id="floorplanView">
+    <div id="floorplanContainer" style="position:relative; display:inline-block; margin:auto;"></div>
+  </div>
+</div>
+
+<input type="file" id="photo-input" accept="image/jpeg,image/png,image/heic,image/heif,image/webp" style="display:none" />
+<input type="file" id="plan-input"  accept="image/jpeg,image/png,image/heic,image/heif,image/webp,application/pdf" style="display:none" />
+<div class="upload-bar" id="upload-bar" style="display:none">
+  <span id="upload-label">Uploading…</span>
+  <div class="upload-track"><div class="upload-fill" id="upload-fill" style="width:0%"></div></div>
+</div>
+
+<script type="module">
+import { esc, isAdult, createDbHelper, createFilesHelper } from "/hub-sdk.js";
+
+// ── State ──────────────────────────────────────────────────────────────────
+
+const DB  = window.__DB_URL;
+const MEM = window.__CURRENT_MEMBER;
+const IS_ADULT = isAdult(MEM);
+
+const dbq   = createDbHelper(DB);
+const files = createFilesHelper(window.__FILES_URL ?? "");
+
+let gardens = [];
+let plants  = [];
+let activeGardenId = null;
+let selectedPlantId = null;
+let currentView = 'list';
+let leafletMap = null;
+let leafletMarkers = [];
+let placementPlant = null;
+let placementMapHandler = null;
+let placementFloorHandler = null;
+
+// ── Schema ─────────────────────────────────────────────────────────────────
+
+async function initSchema() {
+  await dbq(`CREATE TABLE IF NOT EXISTS gardens (
+    id           TEXT PRIMARY KEY,
+    name         TEXT NOT NULL,
+    garden_type  TEXT NOT NULL DEFAULT 'map',
+    plan_image_url TEXT,
+    created_at   TEXT NOT NULL
+  )`);
+  await dbq(`CREATE TABLE IF NOT EXISTS plants (
+    id             TEXT PRIMARY KEY,
+    garden_id      TEXT NOT NULL,
+    common_name    TEXT NOT NULL,
+    scientific_name TEXT,
+    plant_type     TEXT,
+    bed_name       TEXT,
+    notes          TEXT,
+    photo_urls     TEXT NOT NULL DEFAULT '[]',
+    lat            REAL,
+    lng            REAL,
+    added_by_name  TEXT,
+    created_at     TEXT NOT NULL,
+    updated_at     TEXT NOT NULL
+  )`);
+  await dbq(`CREATE INDEX IF NOT EXISTS idx_plants_garden ON plants(garden_id)`);
+}
+
+// ── Load data ──────────────────────────────────────────────────────────────
+
+async function loadGardens() {
+  const { rows } = await dbq('SELECT * FROM gardens ORDER BY name ASC');
+  gardens = rows;
+  const sel = document.getElementById('gardenSelect');
+  sel.innerHTML = '';
+  if (!rows.length) {
+    sel.innerHTML = '<option>No gardens yet</option>';
+    return;
+  }
+  rows.forEach(g => {
+    const opt = document.createElement('option');
+    opt.value = g.id;
+    opt.textContent = g.name;
+    sel.appendChild(opt);
+  });
+  sel.onchange = () => selectGarden(sel.value);
+  selectGarden(rows[0].id);
+}
+
+async function selectGarden(id) {
+  activeGardenId = id;
+  document.getElementById('gardenSelect').value = id;
+  closeDetail();
+  const { rows } = await dbq(
+    'SELECT * FROM plants WHERE garden_id = ? AND (1=1) ORDER BY common_name ASC',
+    [id]
+  );
+  plants = rows.map(p => ({ ...p, photo_urls: JSON.parse(p.photo_urls || '[]') }));
+  renderList();
+  if (currentView === 'map' || currentView === 'floorplan') renderMap();
+  updateMapTabLabel();
+}
+
+function updateMapTabLabel() {
+  const garden = gardens.find(g => g.id === activeGardenId);
+  const isFloor = garden?.garden_type === 'image';
+  document.getElementById('tabMap').textContent = isFloor ? 'Plan' : 'Map';
+}
+
+// ── List view ──────────────────────────────────────────────────────────────
+
+function renderList() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const filtered = q
+    ? plants.filter(p =>
+        p.common_name.toLowerCase().includes(q) ||
+        (p.scientific_name || '').toLowerCase().includes(q) ||
+        (p.bed_name || '').toLowerCase().includes(q)
+      )
+    : plants;
+
+  const el = document.getElementById('plantList');
+  if (!filtered.length) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🌱</div>
+        <div class="empty-title">${plants.length ? 'No matches' : 'No plants yet'}</div>
+        <div class="empty-msg">${plants.length ? 'Try a different search.' : 'Tap + Add Plant to add your first plant.'}</div>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = filtered.map(p => {
+    const thumb = p.photo_urls[0]
+      ? `<div class="plant-thumb"><img src="${esc(p.photo_urls[0])}" loading="lazy" onerror="this.parentElement.innerHTML='🌿'"/></div>`
+      : `<div class="plant-thumb">🌿</div>`;
+    const badge = p.plant_type ? `<span class="type-badge">${esc(p.plant_type)}</span>` : '';
+    const meta = [p.bed_name, p.added_by_name ? `by ${p.added_by_name}` : ''].filter(Boolean).join(' · ');
+    return `<div class="plant-item${p.id === selectedPlantId ? ' selected' : ''}" onclick="selectPlant('${p.id}')">
+      ${thumb}
+      <div class="plant-info">
+        <div class="plant-name">${esc(p.common_name)}</div>
+        ${p.scientific_name ? `<div class="plant-sci">${esc(p.scientific_name)}</div>` : ''}
+        ${meta ? `<div class="plant-meta">${esc(meta)}</div>` : ''}
+      </div>
+      ${badge}
+    </div>`;
+  }).join('');
+}
+
+// ── Detail panel ───────────────────────────────────────────────────────────
+
+function selectPlant(id) {
+  selectedPlantId = id;
+  const p = plants.find(pl => pl.id === id);
+  if (!p) return;
+
+  renderList();
+
+  const photoImgs = p.photo_urls.map(u => `
+    <div style="position:relative;flex-shrink:0;height:100%">
+      <img src="${esc(u)}" onerror="this.parentElement.style.display='none'" style="height:100%;width:auto;object-fit:cover"/>
+      ${IS_ADULT ? `<button class="photo-del-btn" onclick="removePhoto('${p.id}','${encodeURIComponent(u)}')" title="Remove photo">✕</button>` : ''}
+    </div>`).join('');
+
+  const photos = `
+    <div class="photo-strip-wrap">
+      <div class="detail-photos${p.photo_urls.length === 0 ? '' : ''}" style="${p.photo_urls.length === 0 ? 'display:flex;align-items:center;justify-content:center;background:var(--border);height:180px' : ''}">
+        ${p.photo_urls.length === 0 ? '<span style="font-size:3rem">🌿</span>' : photoImgs}
+      </div>
+      ${IS_ADULT ? `<button class="photo-upload-btn" onclick="triggerPhotoUpload('${p.id}')">+ Add photo</button>` : ''}
+    </div>`;
+
+  const rows = [
+    p.scientific_name && row('Scientific Name', `<i>${esc(p.scientific_name)}</i>`),
+    p.plant_type      && row('Type', `<span class="type-badge">${esc(p.plant_type)}</span>`),
+    p.bed_name        && row('Bed / Zone', esc(p.bed_name)),
+    p.notes           && row('Notes', esc(p.notes).replace(/\n/g, '<br>')),
+    p.lat != null     && row('Location', `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`),
+    p.added_by_name   && row('Added By', esc(p.added_by_name)),
+    row('Date Added', new Date(p.created_at).toLocaleDateString()),
+  ].filter(Boolean).join('');
+
+  document.getElementById('detailContent').innerHTML = `
+    ${photos}
+    <div class="detail-body">
+      <div class="detail-name">${esc(p.common_name)}</div>
+      ${rows}
+    </div>`;
+
+  document.getElementById('detailPanel').classList.remove('hidden');
+  document.getElementById('plantList').classList.add('with-detail');
+}
+
+function row(label, value) {
+  return `<div class="detail-row"><div class="detail-label">${label}</div><div class="detail-value">${value}</div></div>`;
+}
+
+function closeDetail() {
+  selectedPlantId = null;
+  document.getElementById('detailPanel').classList.add('hidden');
+  document.getElementById('plantList').classList.remove('with-detail');
+  renderList();
+}
+
+// ── View switcher ──────────────────────────────────────────────────────────
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('tabList').classList.toggle('active', v === 'list');
+  document.getElementById('tabMap').classList.toggle('active', v === 'map' || v === 'floorplan');
+  document.getElementById('searchBar').style.display = v === 'list' ? '' : 'none';
+
+  const listEl      = document.getElementById('plantList');
+  const detailEl    = document.getElementById('detailPanel');
+  const mapViewEl   = document.getElementById('mapView');
+  const floorEl     = document.getElementById('floorplanView');
+
+  listEl.style.display    = v === 'list' ? '' : 'none';
+  detailEl.style.display  = v === 'list' ? '' : 'none';
+  mapViewEl.classList.toggle('active', false);
+  floorEl.classList.toggle('active', false);
+
+  if (v === 'list') return;
+
+  const garden = gardens.find(g => g.id === activeGardenId);
+  if (garden?.garden_type === 'image') {
+    floorEl.classList.add('active');
+    renderFloorPlan(garden);
+  } else {
+    mapViewEl.classList.add('active');
+    renderLeafletMap();
+  }
+}
+
+function onMapTabClick() {
+  const garden = gardens.find(g => g.id === activeGardenId);
+  setView(garden?.garden_type === 'image' ? 'floorplan' : 'map');
+}
+
+// ── Leaflet map ────────────────────────────────────────────────────────────
+
+function renderLeafletMap() {
+  const pinned = plants.filter(p => p.lat != null && p.lng != null);
+
+  if (!leafletMap) {
+    leafletMap = L.map('map');
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors', maxZoom: 19,
+    }).addTo(leafletMap);
+  }
+
+  leafletMarkers.forEach(m => leafletMap.removeLayer(m));
+  leafletMarkers = [];
+
+  if (!pinned.length) {
+    leafletMap.setView([39.5, -98.35], 4);
+    return;
+  }
+
+  const bounds = L.latLngBounds(pinned.map(p => [p.lat, p.lng]));
+  leafletMap.fitBounds(bounds, { padding: [40, 40] });
+
+  pinned.forEach(p => {
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="
+        width:32px;height:32px;border-radius:50%;
+        background:var(--accent,#2d6a4f);
+        display:flex;align-items:center;justify-content:center;
+        font-size:1.1rem;box-shadow:0 2px 6px rgba(0,0,0,.3);
+        overflow:hidden;border:2px solid #fff;
+      ">${p.photo_urls[0]
+        ? `<img src="${esc(p.photo_urls[0])}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.outerHTML='🌿'"/>`
+        : '🌿'
+      }</div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+    });
+    const marker = L.marker([p.lat, p.lng], { icon, draggable: true })
+      .addTo(leafletMap)
+      .bindPopup(`<strong>${esc(p.common_name)}</strong>${p.scientific_name ? `<br><i>${esc(p.scientific_name)}</i>` : ''}`);
+    marker.on('click', () => { if (!placementPlant) { setView('list'); selectPlant(p.id); } });
+    marker.on('dragend', async () => {
+      const ll = marker.getLatLng();
+      await savePlantPosition(p.id, ll.lat, ll.lng);
+    });
+    leafletMarkers.push(marker);
+  });
+}
+
+function renderMap() {
+  if (currentView === 'map') renderLeafletMap();
+  if (currentView === 'floorplan') {
+    const garden = gardens.find(g => g.id === activeGardenId);
+    if (garden) renderFloorPlan(garden);
+  }
+}
+
+// ── Floor plan view ────────────────────────────────────────────────────────
+
+function renderFloorPlan(garden) {
+  const container = document.getElementById('floorplanContainer');
+  container.innerHTML = '';
+
+  if (!garden.plan_image_url) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📐</div>
+        <div class="empty-title">No floor plan</div>
+        <div class="empty-msg">Upload a floor plan image to show where your plants are.</div>
+        ${IS_ADULT ? `<button onclick="triggerPlanUpload('${garden.id}')"
+          style="margin-top:16px;padding:8px 16px;background:var(--accent);color:var(--accent-fg);border:none;border-radius:8px;cursor:pointer;font-size:.875rem;font-weight:600">
+          Upload floor plan
+        </button>` : ''}
+      </div>`;
+    return;
+  }
+
+  const img = document.createElement('img');
+  img.src = garden.plan_image_url;
+  img.className = 'floorplan-img';
+  img.id = 'floorplanImg';
+  container.appendChild(img);
+
+  if (IS_ADULT) {
+    const replaceBtn = document.createElement('button');
+    replaceBtn.className = 'photo-upload-btn';
+    replaceBtn.textContent = '↺ Replace floor plan';
+    replaceBtn.onclick = () => triggerPlanUpload(garden.id);
+    container.appendChild(replaceBtn);
+  }
+
+  img.onload = () => {
+    const pinned = plants.filter(p => p.lat != null && p.lng != null);
+    pinned.forEach(p => {
+      const pin = document.createElement('div');
+      pin.className = 'floorplan-pin';
+      pin.style.left = `${(p.lng ?? 0) * 100}%`;
+      pin.style.top  = `${(p.lat ?? 0) * 100}%`;
+      pin.innerHTML = `
+        <div class="pin-bubble">${p.photo_urls[0]
+          ? `<img src="${esc(p.photo_urls[0])}" onerror="this.outerHTML='🌿'"/>`
+          : '🌿'}</div>
+        <div class="pin-tail"></div>`;
+      pin.title = p.common_name;
+      makePinDraggable(pin, p.id, container);
+      container.appendChild(pin);
+    });
+
+    // Placement-mode click on floor plan
+    if (placementPlant && !placementFloorHandler) {
+      placementFloorHandler = (e) => {
+        if (e.target.closest('.floorplan-pin') || e.target.closest('button')) return;
+        const rect = container.getBoundingClientRect();
+        const lat = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+        const lng = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        savePlantPosition(placementPlant.id, lat, lng);
+        exitPlacementMode();
+      };
+      container.addEventListener('click', placementFloorHandler);
+    }
+  };
+}
+
+// ── Wire tab buttons and search (module scope can't reach inline onclick) ──
+document.getElementById('tabList').onclick = () => setView('list');
+document.getElementById('tabMap').onclick = onMapTabClick;
+document.getElementById('searchInput').addEventListener('input', renderList);
+
+// Expose functions needed by dynamically-rendered innerHTML onclick handlers
+window.selectPlant  = selectPlant;
+window.closeDetail  = closeDetail;
+
+// ── Photo / floor-plan upload ──────────────────────────────────────────────
+
+async function uploadWithProgress(file, label) {
+  const bar   = document.getElementById('upload-bar');
+  const fill  = document.getElementById('upload-fill');
+  const lbl   = document.getElementById('upload-label');
+  bar.style.display = '';
+  lbl.textContent   = `Uploading ${label}…`;
+  fill.style.width  = '0%';
+
+  try {
+    const result = await files.upload(file, (e) => {
+      if (e.lengthComputable) {
+        fill.style.width = `${Math.round(e.loaded / e.total * 100)}%`;
+      }
+    });
+    return result; // { id, url }
+  } finally {
+    bar.style.display = 'none';
+  }
+}
+
+async function addPhotoToPlant(plant, file) {
+  const result = await uploadWithProgress(file, file.name);
+  const updated = [...plant.photo_urls, result.url];
+  await dbq(`UPDATE plants SET photo_urls = ?, updated_at = ? WHERE id = ?`,
+    [JSON.stringify(updated), new Date().toISOString(), plant.id]);
+  plant.photo_urls = updated;
+  selectPlant(plant.id);
+}
+
+async function removePhotoFromPlant(plant, url) {
+  if (!confirm('Remove this photo?')) return;
+  // If it's a hub-stored file, delete it
+  if (url.includes('/api/files/')) {
+    const fileId = url.split('/api/files/')[1];
+    await files.delete(fileId);
+  }
+  const updated = plant.photo_urls.filter(u => u !== url);
+  await dbq(`UPDATE plants SET photo_urls = ?, updated_at = ? WHERE id = ?`,
+    [JSON.stringify(updated), new Date().toISOString(), plant.id]);
+  plant.photo_urls = updated;
+  selectPlant(plant.id);
+}
+
+async function uploadFloorPlan(garden, file) {
+  const result = await uploadWithProgress(file, 'floor plan');
+  // Delete old hub-stored plan if present
+  if (garden.plan_image_url?.includes('/api/files/')) {
+    const old = garden.plan_image_url.split('/api/files/')[1];
+    await files.delete(old);
+  }
+  await dbq(`UPDATE gardens SET plan_image_url = ? WHERE id = ?`,
+    [result.url, garden.id]);
+  garden.plan_image_url = result.url;
+  renderFloorPlan(garden);
+}
+
+// ── Wire file inputs ───────────────────────────────────────────────────────
+
+let _uploadTargetPlant  = null;
+let _uploadTargetGarden = null;
+
+document.getElementById('photo-input').addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  e.target.value = '';
+  if (file && _uploadTargetPlant) await addPhotoToPlant(_uploadTargetPlant, file);
+  _uploadTargetPlant = null;
+});
+
+document.getElementById('plan-input').addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  e.target.value = '';
+  if (file && _uploadTargetGarden) await uploadFloorPlan(_uploadTargetGarden, file);
+  _uploadTargetGarden = null;
+});
+
+window.triggerPhotoUpload = (plantId) => {
+  _uploadTargetPlant = plants.find(p => p.id === plantId) ?? null;
+  if (_uploadTargetPlant) document.getElementById('photo-input').click();
+};
+
+window.triggerPlanUpload = (gardenId) => {
+  _uploadTargetGarden = gardens.find(g => g.id === gardenId) ?? null;
+  if (_uploadTargetGarden) document.getElementById('plan-input').click();
+};
+
+window.removePhoto = (plantId, url) => {
+  const plant = plants.find(p => p.id === plantId);
+  if (plant) removePhotoFromPlant(plant, decodeURIComponent(url));
+};
+
+// ── Draggable floor plan pins ──────────────────────────────────────────────
+
+function makePinDraggable(pin, plantId, container) {
+  let startX, startY, startLng, startLat, didDrag = false;
+
+  pin.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    pin.setPointerCapture(e.pointerId);
+    const rect = container.getBoundingClientRect();
+    startX   = e.clientX;
+    startY   = e.clientY;
+    startLng = parseFloat(pin.style.left) / 100;
+    startLat = parseFloat(pin.style.top)  / 100;
+    didDrag  = false;
+  });
+
+  pin.addEventListener('pointermove', (e) => {
+    if (!pin.hasPointerCapture(e.pointerId)) return;
+    const rect = container.getBoundingClientRect();
+    const dx = (e.clientX - startX) / rect.width;
+    const dy = (e.clientY - startY) / rect.height;
+    if (Math.abs(dx) > 0.003 || Math.abs(dy) > 0.003) didDrag = true;
+    pin.style.left = `${Math.max(0, Math.min(1, startLng + dx)) * 100}%`;
+    pin.style.top  = `${Math.max(0, Math.min(1, startLat + dy)) * 100}%`;
+  });
+
+  pin.addEventListener('pointerup', async (e) => {
+    if (!pin.hasPointerCapture(e.pointerId)) return;
+    pin.releasePointerCapture(e.pointerId);
+    if (didDrag) {
+      const lng = parseFloat(pin.style.left) / 100;
+      const lat = parseFloat(pin.style.top)  / 100;
+      await savePlantPosition(plantId, lat, lng);
+    }
+  });
+
+  pin.addEventListener('click', (e) => {
+    if (didDrag) { e.stopPropagation(); didDrag = false; return; }
+    if (placementPlant) return; // placement mode handles the click
+    setView('list');
+    selectPlant(plantId);
+  });
+}
+
+// ── Save plant position ────────────────────────────────────────────────────
+
+async function savePlantPosition(plantId, lat, lng) {
+  await dbq('UPDATE plants SET lat = ?, lng = ?, updated_at = ? WHERE id = ?',
+    [lat, lng, new Date().toISOString(), plantId]);
+  const p = plants.find(pl => pl.id === plantId);
+  if (p) { p.lat = lat; p.lng = lng; }
+  renderMap();
+}
+
+// ── Placement mode ─────────────────────────────────────────────────────────
+
+function enterPlacementMode(plant) {
+  placementPlant = plant;
+  const garden = gardens.find(g => g.id === activeGardenId);
+  const isFloor = garden?.garden_type === 'image';
+
+  document.getElementById('placementPlantName').textContent = plant.common_name;
+  document.getElementById('placementViewLabel').textContent = isFloor ? 'floor plan' : 'map';
+  document.getElementById('placementBanner').classList.remove('hidden');
+
+  if (isFloor) {
+    setView('floorplan');
+    const container = document.getElementById('floorplanContainer');
+    container.classList.add('placing');
+    // placementFloorHandler is attached inside renderFloorPlan's img.onload
+    // (or immediately if the image was already loaded / no image)
+    if (!container.querySelector('img') || container.querySelector('img')?.complete) {
+      placementFloorHandler = (e) => {
+        if (e.target.closest('.floorplan-pin') || e.target.closest('button')) return;
+        const rect = container.getBoundingClientRect();
+        const lat = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+        const lng = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        savePlantPosition(plant.id, lat, lng);
+        exitPlacementMode();
+      };
+      container.addEventListener('click', placementFloorHandler);
+    }
+  } else {
+    setView('map');
+    placementMapHandler = (e) => {
+      const { lat, lng } = e.latlng;
+      savePlantPosition(plant.id, lat, lng);
+      exitPlacementMode();
+    };
+    leafletMap.once('click', placementMapHandler);
+  }
+}
+
+window.exitPlacementMode = () => {
+  if (!placementPlant) return;
+  placementPlant = null;
+  document.getElementById('placementBanner').classList.add('hidden');
+
+  const container = document.getElementById('floorplanContainer');
+  container.classList.remove('placing');
+  if (placementFloorHandler) {
+    container.removeEventListener('click', placementFloorHandler);
+    placementFloorHandler = null;
+  }
+  if (placementMapHandler && leafletMap) {
+    leafletMap.off('click', placementMapHandler);
+    placementMapHandler = null;
+  }
+};
+
+// ── Add plant ──────────────────────────────────────────────────────────────
+
+window.openAddPlantModal = () => {
+  if (!activeGardenId) return;
+  ['plantNameInput','plantSciInput','plantTypeInput','plantBedInput','plantNotesInput']
+    .forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('addPlantSubmitBtn').disabled = true;
+  document.getElementById('addPlantModal').classList.remove('hidden');
+  setTimeout(() => document.getElementById('plantNameInput').focus(), 50);
+};
+
+window.closeAddPlantModal = () => {
+  document.getElementById('addPlantModal').classList.add('hidden');
+};
+
+document.getElementById('plantNameInput').addEventListener('input', () => {
+  document.getElementById('addPlantSubmitBtn').disabled =
+    !document.getElementById('plantNameInput').value.trim();
+});
+
+document.getElementById('addPlantModal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) window.closeAddPlantModal();
+});
+
+window.submitAddPlant = async () => {
+  const name = document.getElementById('plantNameInput').value.trim();
+  if (!name || !activeGardenId) return;
+
+  const id  = crypto.randomUUID();
+  const now = new Date().toISOString();
+  await dbq(
+    `INSERT INTO plants
+     (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes,
+      photo_urls, lat, lng, added_by_name, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, '[]', NULL, NULL, ?, ?, ?)`,
+    [
+      id, activeGardenId, name,
+      document.getElementById('plantSciInput').value.trim()  || null,
+      document.getElementById('plantTypeInput').value.trim() || null,
+      document.getElementById('plantBedInput').value.trim()  || null,
+      document.getElementById('plantNotesInput').value.trim()|| null,
+      MEM?.display_name || null, now, now,
+    ]
+  );
+
+  window.closeAddPlantModal();
+
+  const { rows } = await dbq(
+    'SELECT * FROM plants WHERE garden_id = ? ORDER BY common_name ASC', [activeGardenId]);
+  plants = rows.map(p => ({ ...p, photo_urls: JSON.parse(p.photo_urls || '[]') }));
+  renderList();
+
+  const newPlant = plants.find(p => p.id === id);
+  if (newPlant) enterPlacementMode(newPlant);
+};
+
+// ── New garden ─────────────────────────────────────────────────────────────
+
+window.openNewGardenModal = () => {
+  document.getElementById('gardenNameInput').value = '';
+  document.getElementById('gardenTypeInput').value = 'map';
+  document.getElementById('createGardenBtn').disabled = true;
+  document.getElementById('newGardenModal').classList.remove('hidden');
+  setTimeout(() => document.getElementById('gardenNameInput').focus(), 50);
+};
+
+window.closeNewGardenModal = () => {
+  document.getElementById('newGardenModal').classList.add('hidden');
+};
+
+window.updateCreateBtn = () => {
+  const name = document.getElementById('gardenNameInput').value.trim();
+  document.getElementById('createGardenBtn').disabled = name.length === 0;
+};
+
+window.createGarden = async () => {
+  const name = document.getElementById('gardenNameInput').value.trim();
+  const gardenType = document.getElementById('gardenTypeInput').value;
+  if (!name) return;
+
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+  await dbq(
+    'INSERT INTO gardens (id, name, garden_type, plan_image_url, created_at) VALUES (?, ?, ?, NULL, ?)',
+    [id, name, gardenType, now]
+  );
+
+  closeNewGardenModal();
+  await loadGardens();
+  selectGarden(id);
+};
+
+// Close modal on backdrop click
+document.getElementById('newGardenModal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeNewGardenModal();
+});
+
+// Close modals / exit placement on Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if (!document.getElementById('newGardenModal').classList.contains('hidden')) {
+    closeNewGardenModal();
+  } else if (!document.getElementById('addPlantModal').classList.contains('hidden')) {
+    window.closeAddPlantModal();
+  } else {
+    window.exitPlacementMode();
+  }
+});
+
+// ── Boot ───────────────────────────────────────────────────────────────────
+
+async function init() {
+  try {
+    await initSchema();
+    await loadGardens();
+    if (IS_ADULT) document.getElementById('newGardenBtn').style.display = '';
+  } catch (e) {
+    console.error('Garden viewer init failed:', e);
+  } finally {
+    document.getElementById('loading').style.display = 'none';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
