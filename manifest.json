@@ -7,11 +7,23 @@
   "runtime": "static",
   "storage": "db",
   "category": "family",
-  "tags": ["garden", "plants", "nature", "outdoor"],
-  "nav": { "label": "Garden", "icon": "🌿" },
-  "widget": { "label": "Garden", "size": "small" },
+  "tags": [
+    "garden",
+    "plants",
+    "nature",
+    "outdoor"
+  ],
+  "nav": {
+    "label": "Garden"
+  },
+  "widget": {
+    "label": "Garden",
+    "size": "small"
+  },
   "data_access": {
-    "reads": ["family.members"],
+    "reads": [
+      "family.members"
+    ],
     "writes": []
   },
   "permissions": {
@@ -26,5 +38,6 @@
     "max_db_bytes": 52428800,
     "max_file_bytes": 15728640,
     "max_files_bytes": 524288000
-  }
+  },
+  "icon": "🌿"
 }
