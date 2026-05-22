@@ -394,7 +394,7 @@
 </div>
 
 <script type="module">
-import { esc, isAdult, createDbHelper, createFilesHelper } from "/hub-sdk.js";
+import { esc, isAdult, createDbHelper, createFilesHelper, hubConfirm } from "/hub-sdk.js";
 
 // ── State ──────────────────────────────────────────────────────────────────
 
@@ -759,7 +759,7 @@ async function addPhotoToPlant(plant, file) {
 }
 
 async function removePhotoFromPlant(plant, url) {
-  if (!confirm('Remove this photo?')) return;
+  if (!await hubConfirm({ message: 'Remove this photo?', confirmLabel: 'Remove', destructive: true })) return;
   // If it's a hub-stored file, delete it
   if (url.includes('/api/files/')) {
     const fileId = url.split('/api/files/')[1];
