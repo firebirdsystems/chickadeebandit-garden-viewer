@@ -395,6 +395,7 @@
 
 <script type="module">
 import { esc, isAdult, createDbHelper, createFilesHelper, hubConfirm } from "/hub-sdk.js";
+import { filterPlants } from "./logic.js";
 
 // ── State ──────────────────────────────────────────────────────────────────
 
@@ -467,13 +468,7 @@ function updateMapTabLabel() {
 
 function renderList() {
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  const filtered = q
-    ? plants.filter(p =>
-        p.common_name.toLowerCase().includes(q) ||
-        (p.scientific_name || '').toLowerCase().includes(q) ||
-        (p.bed_name || '').toLowerCase().includes(q)
-      )
-    : plants;
+  const filtered = filterPlants(plants, q);
 
   const el = document.getElementById('plantList');
   if (!filtered.length) {
