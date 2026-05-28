@@ -2,11 +2,11 @@
   "id": "garden-viewer",
   "name": "Map My Garden",
   "version": "1.1.0",
-  "description": "Browse your household gardens and plants. Add and manage plants from the Map My Garden iOS app — this viewer keeps everyone in the family in sync.",
+  "description": "Browse your gardens and plants. Add and manage plants from the Map My Garden iOS app — this viewer keeps everyone in the family in sync.",
   "entrypoint": "index.html",
   "runtime": "static",
   "storage": "db",
-  "category": "family",
+  "category": "general",
   "tags": [
     "garden",
     "plants",
