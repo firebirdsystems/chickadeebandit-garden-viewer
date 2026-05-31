@@ -39,5 +39,10 @@
     "max_file_bytes": 15728640,
     "max_files_bytes": 524288000
   },
-  "icon": "🌿"
+  "icon": "🌿",
+  "ai_access": {
+    "allowed": true,
+    "mode": "read",
+    "db_exports": ["all_plants"]
+  }
 }
