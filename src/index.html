@@ -426,7 +426,7 @@ async function initSchema() {
 // ── Load data ──────────────────────────────────────────────────────────────
 
 async function loadGardens() {
-  const { rows } = await dbq('SELECT * FROM gardens ORDER BY name ASC');
+  const { rows } = await dbq('SELECT * FROM app_garden_viewer__gardens ORDER BY name ASC');
   gardens = rows;
   const sel = document.getElementById('gardenSelect');
   sel.innerHTML = '';
@@ -449,7 +449,7 @@ async function selectGarden(id) {
   document.getElementById('gardenSelect').value = id;
   closeDetail();
   const { rows } = await dbq(
-    'SELECT * FROM plants WHERE garden_id = ? AND (1=1) ORDER BY common_name ASC',
+    'SELECT * FROM app_garden_viewer__plants WHERE garden_id = ? AND (1=1) ORDER BY common_name ASC',
     [id]
   );
   plants = rows.map(p => ({ ...p, photo_urls: JSON.parse(p.photo_urls || '[]') }));
@@ -760,7 +760,7 @@ async function uploadWithProgress(file, label) {
 async function addPhotoToPlant(plant, file) {
   const result = await uploadWithProgress(file, file.name);
   const updated = [...plant.photo_urls, result.url];
-  await dbq(`UPDATE plants SET photo_urls = ?, updated_at = ? WHERE id = ?`,
+  await dbq(`UPDATE app_garden_viewer__plants SET photo_urls = ?, updated_at = ? WHERE id = ?`,
     [JSON.stringify(updated), new Date().toISOString(), plant.id]);
   plant.photo_urls = updated;
   selectPlant(plant.id);
@@ -774,7 +774,7 @@ async function removePhotoFromPlant(plant, url) {
     await files.delete(fileId);
   }
   const updated = plant.photo_urls.filter(u => u !== url);
-  await dbq(`UPDATE plants SET photo_urls = ?, updated_at = ? WHERE id = ?`,
+  await dbq(`UPDATE app_garden_viewer__plants SET photo_urls = ?, updated_at = ? WHERE id = ?`,
     [JSON.stringify(updated), new Date().toISOString(), plant.id]);
   plant.photo_urls = updated;
   selectPlant(plant.id);
@@ -787,7 +787,7 @@ async function uploadFloorPlan(garden, file) {
     const old = garden.plan_image_url.split('/api/files/')[1];
     await files.delete(old);
   }
-  await dbq(`UPDATE gardens SET plan_image_url = ? WHERE id = ?`,
+  await dbq(`UPDATE app_garden_viewer__gardens SET plan_image_url = ? WHERE id = ?`,
     [result.url, garden.id]);
   garden.plan_image_url = result.url;
   renderFloorPlan(garden);
@@ -875,7 +875,7 @@ function makePinDraggable(pin, plantId, container) {
 // ── Save plant position ────────────────────────────────────────────────────
 
 async function savePlantPosition(plantId, lat, lng) {
-  await dbq('UPDATE plants SET lat = ?, lng = ?, updated_at = ? WHERE id = ?',
+  await dbq('UPDATE app_garden_viewer__plants SET lat = ?, lng = ?, updated_at = ? WHERE id = ?',
     [lat, lng, new Date().toISOString(), plantId]);
   const p = plants.find(pl => pl.id === plantId);
   if (p) { p.lat = lat; p.lng = lng; }
@@ -979,7 +979,7 @@ window.submitAddPlant = async () => {
   const id  = crypto.randomUUID();
   const now = new Date().toISOString();
   await dbq(
-    `INSERT INTO plants
+    `INSERT INTO app_garden_viewer__plants
      (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes,
       photo_urls, lat, lng, added_by_name, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, '[]', NULL, NULL, ?, ?, ?)`,
@@ -996,7 +996,7 @@ window.submitAddPlant = async () => {
   window.closeAddPlantModal();
 
   const { rows } = await dbq(
-    'SELECT * FROM plants WHERE garden_id = ? ORDER BY common_name ASC', [activeGardenId]);
+    'SELECT * FROM app_garden_viewer__plants WHERE garden_id = ? ORDER BY common_name ASC', [activeGardenId]);
   plants = rows.map(p => ({ ...p, photo_urls: JSON.parse(p.photo_urls || '[]') }));
   renderList();
 
@@ -1031,7 +1031,7 @@ window.createGarden = async () => {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
   await dbq(
-    'INSERT INTO gardens (id, name, garden_type, plan_image_url, created_at) VALUES (?, ?, ?, NULL, ?)',
+    'INSERT INTO app_garden_viewer__gardens (id, name, garden_type, plan_image_url, created_at) VALUES (?, ?, ?, NULL, ?)',
     [id, name, gardenType, now]
   );
 

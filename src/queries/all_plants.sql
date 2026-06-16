@@ -9,10 +9,8 @@ SELECT
   p.created_at,
   g.name AS garden_name,
   g.garden_type
-FROM plants p
-JOIN gardens g
+FROM app_garden_viewer__plants p
+JOIN app_garden_viewer__gardens g
   ON g.id            = p.garden_id
-  AND g.household_id = p.household_id
-WHERE p.household_id = current_setting('app.household_id', true)::uuid
 ORDER BY g.name, p.common_name
 LIMIT 500
