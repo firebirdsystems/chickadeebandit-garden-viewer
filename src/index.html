@@ -339,7 +339,7 @@
 <!-- Search (list view only) -->
 <div class="search-bar" id="searchBar">
   <input class="search-input" id="searchInput" placeholder="Search plants…" />
-  <button class="add-plant-btn" id="addPlantBtn" onclick="openAddPlantModal()">+ Add Plant</button>
+  <button class="add-plant-btn" id="addPlantBtn" style="display:none" onclick="openAddPlantModal()">+ Add Plant</button>
 </div>
 
 <!-- Add Plant modal -->
@@ -1072,6 +1072,7 @@ async function init() {
     await initSchema();
     await loadGardens();
     if (IS_ADULT) document.getElementById('newGardenBtn').style.display = '';
+    if (IS_ADULT) document.getElementById('addPlantBtn').style.display = '';
   } catch (e) {
     console.error('Garden viewer init failed:', e);
   } finally {

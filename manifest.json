@@ -40,5 +40,12 @@
     "allowed": true,
     "mode": "read",
     "db_exports": ["all_plants"]
+  },
+  "row_policies": {
+    "gardens":         { "kind": "adult_writable" },
+    "plants":          { "kind": "adult_writable" },
+    "plant_events":    { "kind": "adult_writable" },
+    "care_reminders":  { "kind": "adult_writable" },
+    "garden_activity": { "kind": "adult_writable" }
   }
 }
