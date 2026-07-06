@@ -487,7 +487,7 @@ function renderList() {
       : `<div class="plant-thumb">🌿</div>`;
     const badge = p.plant_type ? `<span class="type-badge">${esc(p.plant_type)}</span>` : '';
     const meta = [p.bed_name, p.added_by_name ? `by ${p.added_by_name}` : ''].filter(Boolean).join(' · ');
-    return `<div class="plant-item${p.id === selectedPlantId ? ' selected' : ''}" data-id="${p.id}" onclick="selectPlant('${p.id}')">
+    return `<div class="plant-item${p.id === selectedPlantId ? ' selected' : ''}" data-id="${esc(p.id)}">
       ${thumb}
       <div class="plant-info">
         <div class="plant-name">${esc(p.common_name)}</div>
@@ -504,17 +504,17 @@ function renderList() {
 function selectPlant(id) {
   // Update selection highlight without rebuilding the list
   if (selectedPlantId && selectedPlantId !== id) {
-    document.querySelector(`.plant-item[data-id="${selectedPlantId}"]`)?.classList.remove('selected');
+    document.querySelector(`.plant-item[data-id="${CSS.escape(selectedPlantId)}"]`)?.classList.remove('selected');
   }
   selectedPlantId = id;
   const p = plants.find(pl => pl.id === id);
   if (!p) return;
-  document.querySelector(`.plant-item[data-id="${id}"]`)?.classList.add('selected');
+  document.querySelector(`.plant-item[data-id="${CSS.escape(id)}"]`)?.classList.add('selected');
 
   const photoImgs = p.photo_urls.map(u => `
     <div style="position:relative;flex-shrink:0;height:100%">
       <img src="${esc(u)}" onerror="this.parentElement.style.display='none'" style="height:100%;width:auto;object-fit:cover"/>
-      ${IS_ADULT ? `<button class="photo-del-btn" onclick="removePhoto('${p.id}','${encodeURIComponent(u)}')" title="Remove photo">✕</button>` : ''}
+      ${IS_ADULT ? `<button class="photo-del-btn" data-plant-id="${esc(p.id)}" data-url="${esc(encodeURIComponent(u))}" title="Remove photo">✕</button>` : ''}
     </div>`).join('');
 
   const photos = `
@@ -522,7 +522,7 @@ function selectPlant(id) {
       <div class="detail-photos${p.photo_urls.length === 0 ? '' : ''}" style="${p.photo_urls.length === 0 ? 'display:flex;align-items:center;justify-content:center;background:var(--border);height:180px' : ''}">
         ${p.photo_urls.length === 0 ? '<span style="font-size:3rem">🌿</span>' : photoImgs}
       </div>
-      ${IS_ADULT ? `<button class="photo-upload-btn" onclick="triggerPhotoUpload('${p.id}')">+ Add photo</button>` : ''}
+      ${IS_ADULT ? `<button class="photo-upload-btn" data-plant-id="${esc(p.id)}">+ Add photo</button>` : ''}
     </div>`;
 
   const rows = [
@@ -553,7 +553,7 @@ function row(label, value) {
 function closeDetail() {
   // Remove selection highlight without rebuilding the list
   if (selectedPlantId) {
-    document.querySelector(`.plant-item[data-id="${selectedPlantId}"]`)?.classList.remove('selected');
+    document.querySelector(`.plant-item[data-id="${CSS.escape(selectedPlantId)}"]`)?.classList.remove('selected');
   }
   selectedPlantId = null;
   document.getElementById('detailPanel').classList.add('hidden');
@@ -667,7 +667,7 @@ function renderFloorPlan(garden) {
         <div class="empty-icon">📐</div>
         <div class="empty-title">No floor plan</div>
         <div class="empty-msg">Upload a floor plan image to show where your plants are.</div>
-        ${IS_ADULT ? `<button onclick="triggerPlanUpload('${garden.id}')"
+        ${IS_ADULT ? `<button class="plan-upload-trigger" data-garden-id="${esc(garden.id)}"
           style="margin-top:16px;padding:8px 16px;background:var(--accent);color:var(--accent-fg);border:none;border-radius:8px;cursor:pointer;font-size:.875rem;font-weight:600">
           Upload floor plan
         </button>` : ''}
@@ -734,6 +734,25 @@ document.getElementById('searchInput').addEventListener('input', () => {
 // Expose functions needed by dynamically-rendered innerHTML onclick handlers
 window.selectPlant  = selectPlant;
 window.closeDetail  = closeDetail;
+
+// Delegated click handlers — row ids are attacker-controllable (any adult can
+// INSERT a plant/garden with a crafted id via raw /api/db), so we never
+// interpolate them into inline onclick JS-string contexts. data-* attributes
+// (esc()'d) + event delegation keep ids out of any executable context.
+document.getElementById('plantList').addEventListener('click', (e) => {
+  const item = e.target.closest('.plant-item');
+  if (item?.dataset.id) selectPlant(item.dataset.id);
+});
+document.getElementById('detailContent').addEventListener('click', (e) => {
+  const del = e.target.closest('.photo-del-btn');
+  if (del) { window.removePhoto(del.dataset.plantId, del.dataset.url); return; }
+  const up = e.target.closest('.photo-upload-btn');
+  if (up) window.triggerPhotoUpload(up.dataset.plantId);
+});
+document.getElementById('floorplanContainer').addEventListener('click', (e) => {
+  const b = e.target.closest('.plan-upload-trigger');
+  if (b) window.triggerPlanUpload(b.dataset.gardenId);
+});
 
 // ── Photo / floor-plan upload ──────────────────────────────────────────────
 
@@ -886,7 +905,7 @@ async function savePlantPosition(plantId, lat, lng) {
     if (marker) marker.setLatLng([lat, lng]);
     else renderLeafletMap();
   } else if (currentView === 'floorplan') {
-    const pin = document.querySelector(`.floorplan-pin[data-plant-id="${plantId}"]`);
+    const pin = document.querySelector(`.floorplan-pin[data-plant-id="${CSS.escape(plantId)}"]`);
     if (pin) { pin.style.left = `${lng * 100}%`; pin.style.top = `${lat * 100}%`; }
     else renderMap();
   }
