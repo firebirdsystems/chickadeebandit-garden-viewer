@@ -1,7 +1,7 @@
 {
   "id": "garden-viewer",
   "name": "Chickadee Garden",
-  "version": "1.5.0",
+  "version": "1.0.0",
   "description": "Browse your gardens and plants. Add and manage plants from the Chickadee Garden mobile app — this viewer keeps everyone in the household in sync.",
   "entrypoint": "index.html",
   "runtime": "static",
@@ -41,6 +41,20 @@
     "allowed": true,
     "mode": "read",
     "db_exports": ["all_plants"]
+  },
+  "append_only_records": {
+    "changes": {
+      "table": "changes",
+      "id_column": "id",
+      "allowed_columns": ["entity_type", "entity_id", "operation"],
+      "created_at_column": "changed_at",
+      "max_text_lengths": { "entity_type": 32, "entity_id": 64, "operation": 8 },
+      "allowed_values": {
+        "entity_type": ["gardens", "plants", "plant_events", "care_reminders"],
+        "operation": ["upsert", "delete"]
+      },
+      "write_acl": { "require_role": "adult" }
+    }
   },
   "row_policies": {
     "gardens":         { "kind": "adult_writable" },
