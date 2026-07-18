@@ -39,21 +39,6 @@ CREATE TABLE IF NOT EXISTS app_garden_viewer__plant_events (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS app_garden_viewer__care_reminders (
-  id             TEXT NOT NULL,
-  plant_id       TEXT NOT NULL,
-  garden_id      TEXT NOT NULL,
-  reminder_type  TEXT NOT NULL,
-  frequency_days INTEGER NOT NULL,
-  next_due_date  TEXT NOT NULL,
-  notes          TEXT,
-  added_by_name  TEXT,
-  created_at     TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  updated_at     TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  version        INTEGER NOT NULL DEFAULT 1,
-  PRIMARY KEY (id)
-);
-
 CREATE TABLE IF NOT EXISTS app_garden_viewer__garden_activity (
   id           TEXT NOT NULL,
   garden_id    TEXT NOT NULL,
@@ -82,9 +67,6 @@ CREATE INDEX IF NOT EXISTS plants_garden_idx
 
 CREATE INDEX IF NOT EXISTS plant_events_plant_idx
   ON app_garden_viewer__plant_events (plant_id, event_date);
-
-CREATE INDEX IF NOT EXISTS care_reminders_plant_idx
-  ON app_garden_viewer__care_reminders (plant_id, next_due_date);
 
 CREATE INDEX IF NOT EXISTS garden_activity_garden_idx
   ON app_garden_viewer__garden_activity (garden_id, created_at);
