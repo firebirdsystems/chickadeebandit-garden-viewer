@@ -1,8 +1,12 @@
 {
   "id": "garden-viewer",
   "name": "Chickadee Garden",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Browse your gardens and plants. Add and manage plants from the Chickadee Garden mobile app — this viewer keeps everyone in the household in sync.",
+  "companion_app": {
+    "name": "Chickadee Garden",
+    "tagline": "Add and manage plants from your phone"
+  },
   "entrypoint": "index.html",
   "runtime": "static",
   "storage": "db",
