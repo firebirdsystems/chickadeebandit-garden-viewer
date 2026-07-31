@@ -65,6 +65,14 @@
     "plants":          { "kind": "adult_writable" },
     "plant_events":    { "kind": "adult_writable" },
     "garden_activity": { "kind": "adult_writable", "retain_days": { "default": 365, "timestamp_column": "created_at", "override_key": "activity_history" } },
-    "changes":         { "kind": "endpoint_only", "read": "everyone" }
+    "changes":         {
+      "kind": "endpoint_only",
+      "read": "everyone",
+      "retain_days": {
+        "default": 365,
+        "timestamp_column": "changed_at",
+        "override_key": "activity_history"
+      }
+    }
   }
 }

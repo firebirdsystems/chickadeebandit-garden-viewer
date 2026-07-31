@@ -394,7 +394,7 @@
 </div>
 
 <script type="module">
-import { esc, isAdult, createDbHelper, createFilesHelper, hubConfirm } from "/hub-sdk.js";
+import { esc, isAdult, createDbHelper, createFilesHelper, hubAlert, hubConfirm } from "/hub-sdk.js";
 import { filterPlants } from "./logic.js";
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -779,36 +779,84 @@ async function uploadWithProgress(file, label) {
 async function addPhotoToPlant(plant, file) {
   const result = await uploadWithProgress(file, file.name);
   const updated = [...plant.photo_urls, result.url];
-  await dbq(`UPDATE app_garden_viewer__plants SET photo_urls = ?, updated_at = ? WHERE id = ?`,
-    [JSON.stringify(updated), new Date().toISOString(), plant.id]);
-  plant.photo_urls = updated;
+  if (!await writePhotoUrls(plant, updated)) return;
   selectPlant(plant.id);
+}
+
+/**
+ * Writes a plant's photo list under an optimistic-concurrency guard, using the
+ * `version` column that has been in the schema since 001_init and was never
+ * read.
+ *
+ * `photo_urls` is a JSON array edited by read-modify-write, so two members
+ * adding photos at the same time each wrote back a list built from what they
+ * loaded — and the second write silently erased the first one's photo, leaving
+ * an uploaded file with nothing referencing it. The version check turns that
+ * into a retry: the UPDATE only lands on the row version the caller read, and
+ * a mismatch reloads and re-applies the edit to the current list.
+ *
+ * Returns false if the write could not be completed, having already told the
+ * member why.
+ */
+const PHOTO_WRITE_ATTEMPTS = 3;
+async function writePhotoUrls(plant, nextUrls) {
+  let desired = nextUrls;
+  let current = plant;
+  for (let attempt = 0; attempt < PHOTO_WRITE_ATTEMPTS; attempt++) {
+    const { changed } = await dbq(
+      `UPDATE app_garden_viewer__plants SET photo_urls = ?, updated_at = ?, version = version + 1
+        WHERE id = ? AND version = ?`,
+      [JSON.stringify(desired), new Date().toISOString(), current.id, current.version],
+    );
+    if (changed) {
+      plant.photo_urls = desired;
+      plant.version = Number(current.version) + 1;
+      return true;
+    }
+    // Somebody else wrote first. Re-read, then re-apply this edit — as a set
+    // difference, so a concurrent addition survives instead of being clobbered.
+    const { rows } = await dbq(`SELECT * FROM app_garden_viewer__plants WHERE id = ?`, [current.id]);
+    if (!rows?.[0]) {
+      await hubAlert('This plant was removed while you were editing it.');
+      return false;
+    }
+    const fresh = { ...rows[0], photo_urls: JSON.parse(rows[0].photo_urls || '[]') };
+    const removed = new Set(current.photo_urls.filter(u => !desired.includes(u)));
+    const added = desired.filter(u => !current.photo_urls.includes(u));
+    desired = [...fresh.photo_urls.filter(u => !removed.has(u)), ...added];
+    current = fresh;
+  }
+  await hubAlert('Someone else is editing this plant’s photos. Try again in a moment.');
+  return false;
 }
 
 async function removePhotoFromPlant(plant, url) {
   if (!await hubConfirm({ message: 'Remove this photo?', confirmLabel: 'Remove', destructive: true })) return;
-  // If it's a hub-stored file, delete it
-  if (url.includes('/api/files/')) {
-    const fileId = url.split('/api/files/')[1];
-    await files.delete(fileId);
-  }
+  // Unlink FIRST, delete the bytes second. The old order deleted the file and
+  // then wrote the row: if the write failed, photo_urls still pointed at bytes
+  // that no longer existed and the gallery rendered a permanent broken image
+  // nothing in the UI could clear. Reversed, the worst case is an unreferenced
+  // file — invisible, and reclaimable — instead of a dangling reference.
   const updated = plant.photo_urls.filter(u => u !== url);
-  await dbq(`UPDATE app_garden_viewer__plants SET photo_urls = ?, updated_at = ? WHERE id = ?`,
-    [JSON.stringify(updated), new Date().toISOString(), plant.id]);
-  plant.photo_urls = updated;
+  if (!await writePhotoUrls(plant, updated)) return;
+  if (url.includes('/api/files/')) {
+    await files.delete(url.split('/api/files/')[1]).catch(() => {});
+  }
   selectPlant(plant.id);
 }
 
 async function uploadFloorPlan(garden, file) {
   const result = await uploadWithProgress(file, 'floor plan');
-  // Delete old hub-stored plan if present
-  if (garden.plan_image_url?.includes('/api/files/')) {
-    const old = garden.plan_image_url.split('/api/files/')[1];
-    await files.delete(old);
-  }
+  const previous = garden.plan_image_url;
+  // Point the garden at the new plan before discarding the old one, for the
+  // same reason as photos above: a failed write used to leave the garden
+  // referencing a plan whose bytes had already been deleted.
   await dbq(`UPDATE app_garden_viewer__gardens SET plan_image_url = ? WHERE id = ?`,
     [result.url, garden.id]);
   garden.plan_image_url = result.url;
+  if (previous?.includes('/api/files/')) {
+    await files.delete(previous.split('/api/files/')[1]).catch(() => {});
+  }
   renderFloorPlan(garden);
 }
 
