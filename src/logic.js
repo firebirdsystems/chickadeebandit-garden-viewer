@@ -1,13 +1,8 @@
 /**
- * @param {object[]} plants
- * @param {string} query  already lowercased
+ * Fields the in-app search matches against (see hub-sdk `searchMatch`). The
+ * scientific name is in here because that is what plant labels and nursery
+ * receipts carry, and the bed name so a whole bed can be pulled up at once.
  */
-export function filterPlants(plants, query) {
-  if (!query) return [...plants];
-  const q = query.toLowerCase();
-  return plants.filter(p =>
-    p.common_name.toLowerCase().includes(q) ||
-    (p.scientific_name || '').toLowerCase().includes(q) ||
-    (p.bed_name || '').toLowerCase().includes(q)
-  );
+export function searchableFields(plant) {
+  return [plant.common_name, plant.scientific_name, plant.bed_name, plant.notes];
 }

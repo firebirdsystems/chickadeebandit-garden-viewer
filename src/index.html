@@ -394,8 +394,8 @@
 </div>
 
 <script type="module">
-import { esc, isAdult, createDbHelper, createFilesHelper, hubAlert, hubConfirm } from "/hub-sdk.js";
-import { filterPlants } from "./logic.js";
+import { esc, isAdult, createDbHelper, createFilesHelper, hubAlert, hubConfirm, searchMatch } from "/hub-sdk.js";
+import { searchableFields } from "./logic.js";
 
 // ── State ──────────────────────────────────────────────────────────────────
 
@@ -467,8 +467,8 @@ function updateMapTabLabel() {
 // ── List view ──────────────────────────────────────────────────────────────
 
 function renderList() {
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  const filtered = filterPlants(plants, q);
+  const q = document.getElementById('searchInput').value.trim();
+  const filtered = q ? plants.filter(p => searchMatch(q, searchableFields(p))) : [...plants];
 
   const el = document.getElementById('plantList');
   if (!filtered.length) {
