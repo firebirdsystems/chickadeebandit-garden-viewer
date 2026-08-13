@@ -1,7 +1,7 @@
 {
   "id": "garden-viewer",
   "name": "Chickadee Garden",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Browse your gardens and plants. Add and manage plants from the Chickadee Garden mobile app — this viewer keeps everyone in the household in sync.",
   "companion_app": {
     "name": "Chickadee Garden",
@@ -30,6 +30,11 @@
   "permissions": {
     "default_audience": "everyone",
     "requires_approval": false
+  },
+  "member_references": {
+    "plants": { "column": "added_by_id", "on_removed": "keep" },
+    "plant_events": { "column": "added_by_id", "on_removed": "keep" },
+    "garden_activity": { "column": "actor_id", "on_removed": "keep" }
   },
   "cdn_whitelist": [
     "https://unpkg.com",
