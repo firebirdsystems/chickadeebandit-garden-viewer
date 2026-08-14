@@ -1,0 +1,108 @@
+{
+  "scenarios": [
+    {
+      "name": "the view tabs switch between the plant list and the plan, and search narrows the list",
+      "members": {
+        "member": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_garden_viewer__gardens (id, name, garden_type, created_at, updated_at) VALUES (?, ?, 'image', datetime('now'), datetime('now'))",
+          "params": [
+            "ui-garden",
+            "Back Yard"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, created_at, updated_at) VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))",
+          "params": [
+            "ui-plant-1",
+            "ui-garden",
+            "Tomato",
+            "Solanum lycopersicum"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, created_at, updated_at) VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))",
+          "params": [
+            "ui-plant-2",
+            "ui-garden",
+            "Basil",
+            "Ocimum basilicum"
+          ]
+        },
+        {
+          "action": "open"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"plant-item\"]"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"plant-item\"]",
+          "count": 2
+        },
+        {
+          "action": "expectText",
+          "text": "Tomato",
+          "selector": "[data-testid=\"plant-list\"]"
+        },
+        {
+          "action": "expectText",
+          "text": "Basil",
+          "selector": "[data-testid=\"plant-list\"]"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"view-map\"]"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"floorplan-view\"]"
+        },
+        {
+          "action": "expectText",
+          "text": "No floor plan",
+          "selector": "[data-testid=\"floorplan-view\"]"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"view-list\"]"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"plant-item\"]"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"plant-item\"]",
+          "count": 2
+        },
+        {
+          "action": "fill",
+          "selector": "[data-testid=\"search-input\"]",
+          "value": "Basil"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"plant-item\"]",
+          "count": 1
+        },
+        {
+          "action": "expectText",
+          "text": "Basil",
+          "selector": "[data-testid=\"plant-list\"]"
+        },
+        {
+          "action": "expectNoText",
+          "text": "Tomato",
+          "selector": "[data-testid=\"plant-list\"]"
+        }
+      ]
+    }
+  ]
+}

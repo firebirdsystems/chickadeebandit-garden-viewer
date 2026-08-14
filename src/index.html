@@ -20,6 +20,11 @@
       --radius:  var(--hub-radius, 0.5rem);
       --green:   #2d6a4f;
       --green-lt: #d1fae5;
+      /* Backdrop behind photos / floor plans — a soft tint of the accent so
+         letterboxed images sit on something warmer than flat black. */
+      --photo-bg: linear-gradient(160deg,
+                    color-mix(in srgb, var(--accent) 8%, var(--card)),
+                    color-mix(in srgb, var(--accent) 18%, var(--card)));
     }
 
     body {
@@ -126,16 +131,17 @@
     .detail-panel.hidden { display: none; }
     .detail-photos {
       width: 100%; height: 220px; overflow-x: auto;
-      display: flex; gap: 4px; background: #111;
+      display: flex; gap: 4px;
+      /* `safe center` keeps a wide strip scrollable instead of clipping its
+         left edge; browsers without it simply fall back to left-aligned. */
+      justify-content: safe center;
+      background: var(--card);
+      background: var(--photo-bg);
     }
     .detail-photos img {
       height: 100%; width: auto; object-fit: cover; flex-shrink: 0;
     }
-    .detail-photos-empty {
-      width: 100%; height: 180px; display: flex;
-      align-items: center; justify-content: center;
-      background: var(--border); font-size: 3rem;
-    }
+    .detail-photo { position: relative; flex-shrink: 0; height: 100%; }
     .detail-body { padding: 20px 24px; }
     .detail-name { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
     .detail-sci { font-size: 0.95rem; color: var(--muted); font-style: italic; margin-bottom: 12px; }
@@ -204,10 +210,17 @@
     .photo-upload-btn:hover { background: rgba(0,0,0,.8); }
     .photo-del-btn {
       position: absolute; top: 6px; right: 6px;
-      background: rgba(220,38,38,.85); color: #fff; border: none;
+      background: rgba(0,0,0,.55); color: #fff; border: none;
       border-radius: 50%; width: 22px; height: 22px; font-size: 0.7rem;
       cursor: pointer; display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .15s, background .15s;
+      backdrop-filter: blur(4px);
     }
+    .detail-photo:hover .photo-del-btn,
+    .photo-del-btn:focus-visible { opacity: 1; }
+    .photo-del-btn:hover { background: rgba(220,38,38,.9); }
+    /* Touch devices never hover, so the control has to stay reachable. */
+    @media (hover: none) { .photo-del-btn { opacity: 1; } }
 
     /* ── Placement banner ── */
     .placement-banner {
@@ -306,8 +319,8 @@
   <span style="font-size:1.2rem">🌿</span>
   <select class="garden-select" id="gardenSelect"></select>
   <div class="view-tabs">
-    <button class="tab-btn active" id="tabList" onclick="setView('list')">List</button>
-    <button class="tab-btn" id="tabMap" onclick="setView('map')">Map</button>
+    <button class="tab-btn active" id="tabList" data-testid="view-list" onclick="setView('list')">List</button>
+    <button class="tab-btn" id="tabMap" data-testid="view-map" onclick="setView('map')">Map</button>
   </div>
   <button class="new-garden-btn" id="newGardenBtn" style="display:none" onclick="openNewGardenModal()">+ New</button>
 </div>
@@ -338,7 +351,7 @@
 
 <!-- Search (list view only) -->
 <div class="search-bar" id="searchBar">
-  <input class="search-input" id="searchInput" placeholder="Search plants…" />
+  <input class="search-input" id="searchInput" data-testid="search-input" placeholder="Search plants…" />
   <button class="add-plant-btn" id="addPlantBtn" style="display:none" onclick="openAddPlantModal()">+ Add Plant</button>
 </div>
 
@@ -367,7 +380,7 @@
 <div class="main" id="main">
 
   <!-- Plants list -->
-  <div class="plant-list" id="plantList"></div>
+  <div class="plant-list" id="plantList" data-testid="plant-list"></div>
 
   <!-- Detail panel -->
   <div class="detail-panel hidden" id="detailPanel">
@@ -376,12 +389,12 @@
   </div>
 
   <!-- Map view (Leaflet) -->
-  <div class="map-view" id="mapView">
+  <div class="map-view" id="mapView" data-testid="map-view">
     <div id="map"></div>
   </div>
 
   <!-- Floor plan view -->
-  <div class="floorplan-view" id="floorplanView">
+  <div class="floorplan-view" id="floorplanView" data-testid="floorplan-view">
     <div id="floorplanContainer" style="position:relative; display:inline-block; margin:auto;"></div>
   </div>
 </div>
@@ -507,10 +520,10 @@ function renderList() {
       : `<div class="plant-thumb">🌿</div>`;
     const badge = p.plant_type ? `<span class="type-badge">${esc(p.plant_type)}</span>` : '';
     const meta = [p.bed_name, p.added_by_name ? `by ${p.added_by_name}` : ''].filter(Boolean).join(' · ');
-    return `<div class="plant-item${p.id === selectedPlantId ? ' selected' : ''}" data-id="${esc(p.id)}">
+    return `<div class="plant-item${p.id === selectedPlantId ? ' selected' : ''}" data-testid="plant-item" data-id="${esc(p.id)}">
       ${thumb}
       <div class="plant-info">
-        <div class="plant-name">${esc(p.common_name)}</div>
+        <div class="plant-name" data-testid="plant-name">${esc(p.common_name)}</div>
         ${p.scientific_name ? `<div class="plant-sci">${esc(p.scientific_name)}</div>` : ''}
         ${meta ? `<div class="plant-meta">${esc(meta)}</div>` : ''}
       </div>
@@ -532,15 +545,15 @@ function selectPlant(id) {
   document.querySelector(`.plant-item[data-id="${CSS.escape(id)}"]`)?.classList.add('selected');
 
   const photoImgs = p.photo_urls.map(u => `
-    <div style="position:relative;flex-shrink:0;height:100%">
+    <div class="detail-photo">
       <img src="${esc(photoSrc(u))}" onerror="this.parentElement.style.display='none'" style="height:100%;width:auto;object-fit:cover"/>
       ${IS_ADULT ? `<button class="photo-del-btn" data-plant-id="${esc(p.id)}" data-url="${esc(encodeURIComponent(u))}" title="Remove photo">✕</button>` : ''}
     </div>`).join('');
 
   const photos = `
     <div class="photo-strip-wrap">
-      <div class="detail-photos${p.photo_urls.length === 0 ? '' : ''}" style="${p.photo_urls.length === 0 ? 'display:flex;align-items:center;justify-content:center;background:var(--border);height:180px' : ''}">
-        ${p.photo_urls.length === 0 ? '<span style="font-size:3rem">🌿</span>' : photoImgs}
+      <div class="detail-photos" style="${p.photo_urls.length === 0 ? 'align-items:center;font-size:3rem;height:180px' : ''}">
+        ${p.photo_urls.length === 0 ? '<span>🌿</span>' : photoImgs}
       </div>
       ${IS_ADULT ? `<button class="photo-upload-btn" data-plant-id="${esc(p.id)}">+ Add photo</button>` : ''}
     </div>`;
@@ -754,6 +767,7 @@ document.getElementById('searchInput').addEventListener('input', () => {
 // Expose functions needed by dynamically-rendered innerHTML onclick handlers
 window.selectPlant  = selectPlant;
 window.closeDetail  = closeDetail;
+window.setView      = setView;
 
 // Delegated click handlers — row ids are attacker-controllable (any adult can
 // INSERT a plant/garden with a crafted id via raw /api/db), so we never
