@@ -417,6 +417,26 @@ let placementPlant = null;
 let placementMapHandler = null;
 let placementFloorHandler = null;
 
+/**
+ * Same-origin `src` for a stored photo URL.
+ *
+ * Files uploaded here are recorded as the root-relative path the Hub returns,
+ * but the mobile app records the same file hub-origin-absolute
+ * (`https://<hub>/run/garden-viewer/api/files/<id>`). This viewer is served
+ * from the app's OWN origin, so those absolute URLs are cross-origin and the
+ * app CSP's `img-src 'self'` blocks them. Only the path identifies the file —
+ * the bytes are always served by whichever origin is hosting this page — so
+ * every stored form renders through its pathname.
+ */
+function photoSrc(url) {
+  if (!url) return '';
+  try {
+    return new URL(url, location.origin).pathname;
+  } catch {
+    return url;
+  }
+}
+
 // ── Schema ─────────────────────────────────────────────────────────────────
 
 async function initSchema() {
@@ -483,7 +503,7 @@ function renderList() {
 
   el.innerHTML = filtered.map(p => {
     const thumb = p.photo_urls[0]
-      ? `<div class="plant-thumb"><img src="${esc(p.photo_urls[0])}" loading="lazy" onerror="this.parentElement.innerHTML='🌿'"/></div>`
+      ? `<div class="plant-thumb"><img src="${esc(photoSrc(p.photo_urls[0]))}" loading="lazy" onerror="this.parentElement.innerHTML='🌿'"/></div>`
       : `<div class="plant-thumb">🌿</div>`;
     const badge = p.plant_type ? `<span class="type-badge">${esc(p.plant_type)}</span>` : '';
     const meta = [p.bed_name, p.added_by_name ? `by ${p.added_by_name}` : ''].filter(Boolean).join(' · ');
@@ -513,7 +533,7 @@ function selectPlant(id) {
 
   const photoImgs = p.photo_urls.map(u => `
     <div style="position:relative;flex-shrink:0;height:100%">
-      <img src="${esc(u)}" onerror="this.parentElement.style.display='none'" style="height:100%;width:auto;object-fit:cover"/>
+      <img src="${esc(photoSrc(u))}" onerror="this.parentElement.style.display='none'" style="height:100%;width:auto;object-fit:cover"/>
       ${IS_ADULT ? `<button class="photo-del-btn" data-plant-id="${esc(p.id)}" data-url="${esc(encodeURIComponent(u))}" title="Remove photo">✕</button>` : ''}
     </div>`).join('');
 
@@ -628,7 +648,7 @@ function renderLeafletMap() {
         font-size:1.1rem;box-shadow:0 2px 6px rgba(0,0,0,.3);
         overflow:hidden;border:2px solid #fff;
       ">${p.photo_urls[0]
-        ? `<img src="${esc(p.photo_urls[0])}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.outerHTML='🌿'"/>`
+        ? `<img src="${esc(photoSrc(p.photo_urls[0]))}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.outerHTML='🌿'"/>`
         : '🌿'
       }</div>`,
       iconSize: [32, 32],
@@ -676,7 +696,7 @@ function renderFloorPlan(garden) {
   }
 
   const img = document.createElement('img');
-  img.src = garden.plan_image_url;
+  img.src = photoSrc(garden.plan_image_url);
   img.className = 'floorplan-img';
   img.id = 'floorplanImg';
   container.appendChild(img);
@@ -699,7 +719,7 @@ function renderFloorPlan(garden) {
       pin.style.top  = `${(p.lat ?? 0) * 100}%`;
       pin.innerHTML = `
         <div class="pin-bubble">${p.photo_urls[0]
-          ? `<img src="${esc(p.photo_urls[0])}" onerror="this.outerHTML='🌿'"/>`
+          ? `<img src="${esc(photoSrc(p.photo_urls[0]))}" onerror="this.outerHTML='🌿'"/>`
           : '🌿'}</div>
         <div class="pin-tail"></div>`;
       pin.title = p.common_name;
