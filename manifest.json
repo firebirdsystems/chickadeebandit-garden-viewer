@@ -1,8 +1,8 @@
 {
   "id": "garden-viewer",
   "name": "Chickadee Garden",
-  "version": "1.2.1",
-  "description": "Browse your gardens and plants. Add and manage plants from the Chickadee Garden mobile app — this viewer keeps everyone in the household in sync.",
+  "version": "1.3.0",
+  "description": "Browse your gardens and plants. Add and manage plants from the Chickadee Garden mobile app \u2014 this viewer keeps everyone in the household in sync.",
   "companion_app": {
     "name": "Chickadee Garden",
     "tagline": "Add and manage plants from your phone"
@@ -32,9 +32,18 @@
     "requires_approval": false
   },
   "member_references": {
-    "plants": { "column": "added_by_id", "on_removed": "keep" },
-    "plant_events": { "column": "added_by_id", "on_removed": "keep" },
-    "garden_activity": { "column": "actor_id", "on_removed": "keep" }
+    "plants": {
+      "column": "added_by_id",
+      "on_removed": "keep"
+    },
+    "plant_events": {
+      "column": "added_by_id",
+      "on_removed": "keep"
+    },
+    "garden_activity": {
+      "column": "actor_id",
+      "on_removed": "keep"
+    }
   },
   "cdn_whitelist": [
     "https://unpkg.com",
@@ -45,32 +54,64 @@
     "max_file_bytes": 15728640,
     "max_files_bytes": 524288000
   },
-  "icon": "🌿",
+  "icon": "\ud83c\udf3f",
   "ai_access": {
     "allowed": true,
     "mode": "read",
-    "db_exports": ["all_plants"]
+    "db_exports": [
+      "all_plants"
+    ]
   },
   "append_only_records": {
     "changes": {
       "table": "changes",
       "id_column": "id",
-      "allowed_columns": ["entity_type", "entity_id", "operation"],
+      "allowed_columns": [
+        "entity_type",
+        "entity_id",
+        "operation"
+      ],
       "created_at_column": "changed_at",
-      "max_text_lengths": { "entity_type": 32, "entity_id": 64, "operation": 8 },
-      "allowed_values": {
-        "entity_type": ["gardens", "plants", "plant_events"],
-        "operation": ["upsert", "delete"]
+      "max_text_lengths": {
+        "entity_type": 32,
+        "entity_id": 64,
+        "operation": 8
       },
-      "write_acl": { "require_role": "adult" }
+      "allowed_values": {
+        "entity_type": [
+          "gardens",
+          "plants",
+          "plant_events"
+        ],
+        "operation": [
+          "upsert",
+          "delete"
+        ]
+      },
+      "write_acl": {
+        "require_role": "adult"
+      }
     }
   },
   "row_policies": {
-    "gardens":         { "kind": "adult_writable" },
-    "plants":          { "kind": "adult_writable" },
-    "plant_events":    { "kind": "adult_writable" },
-    "garden_activity": { "kind": "adult_writable", "retain_days": { "default": 365, "timestamp_column": "created_at", "override_key": "activity_history" } },
-    "changes":         {
+    "gardens": {
+      "kind": "adult_writable"
+    },
+    "plants": {
+      "kind": "adult_writable"
+    },
+    "plant_events": {
+      "kind": "adult_writable"
+    },
+    "garden_activity": {
+      "kind": "adult_writable",
+      "retain_days": {
+        "default": 365,
+        "timestamp_column": "created_at",
+        "override_key": "activity_history"
+      }
+    },
+    "changes": {
       "kind": "endpoint_only",
       "read": "everyone",
       "retain_days": {
@@ -79,5 +120,25 @@
         "override_key": "activity_history"
       }
     }
+  },
+  "update_file_columns": {
+    "gardens": [
+      "plan_file_id"
+    ]
+  },
+  "update_file_list_columns": {
+    "plants": [
+      "photo_file_ids"
+    ]
+  },
+  "delete_file_columns": {
+    "gardens": [
+      "plan_file_id"
+    ]
+  },
+  "delete_file_list_columns": {
+    "plants": [
+      "photo_file_ids"
+    ]
   }
 }

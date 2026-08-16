@@ -431,23 +431,20 @@ let placementMapHandler = null;
 let placementFloorHandler = null;
 
 /**
- * Same-origin `src` for a stored photo URL.
+ * Same-origin `src` for a stored hub file id.
  *
- * Files uploaded here are recorded as the root-relative path the Hub returns,
- * but the mobile app records the same file hub-origin-absolute
- * (`https://<hub>/run/garden-viewer/api/files/<id>`). This viewer is served
- * from the app's OWN origin, so those absolute URLs are cross-origin and the
- * app CSP's `img-src 'self'` blocks them. Only the path identifies the file —
- * the bytes are always served by whichever origin is hosting this page — so
- * every stored form renders through its pathname.
+ * The columns hold bare file ids, never URLs, on both surfaces — this viewer
+ * and the Chickadee Garden companion. That is what lets the app declare them
+ * to the hub's reclaim keys, which hand a column's contents straight to the
+ * deletion outbox and so cannot accept a URL.
+ *
+ * It also removes a cross-origin bug the URL form carried: the companion
+ * recorded files hub-origin-absolute, this viewer is served from the app's OWN
+ * origin, and the app CSP's `img-src 'self'` blocked those absolute URLs. An id
+ * resolved through files.url() is same-origin by construction.
  */
-function photoSrc(url) {
-  if (!url) return '';
-  try {
-    return new URL(url, location.origin).pathname;
-  } catch {
-    return url;
-  }
+function photoSrc(fileId) {
+  return fileId ? files.url(fileId) : '';
 }
 
 // ── Schema ─────────────────────────────────────────────────────────────────
@@ -485,7 +482,7 @@ async function selectGarden(id) {
     'SELECT * FROM app_garden_viewer__plants WHERE garden_id = ? AND (1=1) ORDER BY common_name ASC',
     [id]
   );
-  plants = rows.map(p => ({ ...p, photo_urls: JSON.parse(p.photo_urls || '[]') }));
+  plants = rows.map(p => ({ ...p, photo_file_ids: JSON.parse(p.photo_file_ids || '[]') }));
   renderList();
   if (currentView === 'map' || currentView === 'floorplan') renderMap();
   updateMapTabLabel();
@@ -515,8 +512,8 @@ function renderList() {
   }
 
   el.innerHTML = filtered.map(p => {
-    const thumb = p.photo_urls[0]
-      ? `<div class="plant-thumb"><img src="${esc(photoSrc(p.photo_urls[0]))}" loading="lazy" onerror="this.parentElement.innerHTML='🌿'"/></div>`
+    const thumb = p.photo_file_ids[0]
+      ? `<div class="plant-thumb"><img src="${esc(photoSrc(p.photo_file_ids[0]))}" loading="lazy" onerror="this.parentElement.innerHTML='🌿'"/></div>`
       : `<div class="plant-thumb">🌿</div>`;
     const badge = p.plant_type ? `<span class="type-badge">${esc(p.plant_type)}</span>` : '';
     const meta = [p.bed_name, p.added_by_name ? `by ${p.added_by_name}` : ''].filter(Boolean).join(' · ');
@@ -544,16 +541,16 @@ function selectPlant(id) {
   if (!p) return;
   document.querySelector(`.plant-item[data-id="${CSS.escape(id)}"]`)?.classList.add('selected');
 
-  const photoImgs = p.photo_urls.map(u => `
+  const photoImgs = p.photo_file_ids.map(fid => `
     <div class="detail-photo">
-      <img src="${esc(photoSrc(u))}" onerror="this.parentElement.style.display='none'" style="height:100%;width:auto;object-fit:cover"/>
-      ${IS_ADULT ? `<button class="photo-del-btn" data-plant-id="${esc(p.id)}" data-url="${esc(encodeURIComponent(u))}" title="Remove photo">✕</button>` : ''}
+      <img src="${esc(photoSrc(fid))}" onerror="this.parentElement.style.display='none'" style="height:100%;width:auto;object-fit:cover"/>
+      ${IS_ADULT ? `<button class="photo-del-btn" data-plant-id="${esc(p.id)}" data-file-id="${esc(encodeURIComponent(fid))}" title="Remove photo">✕</button>` : ''}
     </div>`).join('');
 
   const photos = `
     <div class="photo-strip-wrap">
-      <div class="detail-photos" style="${p.photo_urls.length === 0 ? 'align-items:center;font-size:3rem;height:180px' : ''}">
-        ${p.photo_urls.length === 0 ? '<span>🌿</span>' : photoImgs}
+      <div class="detail-photos" style="${p.photo_file_ids.length === 0 ? 'align-items:center;font-size:3rem;height:180px' : ''}">
+        ${p.photo_file_ids.length === 0 ? '<span>🌿</span>' : photoImgs}
       </div>
       ${IS_ADULT ? `<button class="photo-upload-btn" data-plant-id="${esc(p.id)}">+ Add photo</button>` : ''}
     </div>`;
@@ -660,8 +657,8 @@ function renderLeafletMap() {
         display:flex;align-items:center;justify-content:center;
         font-size:1.1rem;box-shadow:0 2px 6px rgba(0,0,0,.3);
         overflow:hidden;border:2px solid #fff;
-      ">${p.photo_urls[0]
-        ? `<img src="${esc(photoSrc(p.photo_urls[0]))}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.outerHTML='🌿'"/>`
+      ">${p.photo_file_ids[0]
+        ? `<img src="${esc(photoSrc(p.photo_file_ids[0]))}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.outerHTML='🌿'"/>`
         : '🌿'
       }</div>`,
       iconSize: [32, 32],
@@ -694,7 +691,7 @@ function renderFloorPlan(garden) {
   const container = document.getElementById('floorplanContainer');
   container.innerHTML = '';
 
-  if (!garden.plan_image_url) {
+  if (!garden.plan_file_id) {
     container.innerHTML = `
       <div class="empty-state">
         <div class="empty-icon">📐</div>
@@ -709,7 +706,7 @@ function renderFloorPlan(garden) {
   }
 
   const img = document.createElement('img');
-  img.src = photoSrc(garden.plan_image_url);
+  img.src = photoSrc(garden.plan_file_id);
   img.className = 'floorplan-img';
   img.id = 'floorplanImg';
   container.appendChild(img);
@@ -731,8 +728,8 @@ function renderFloorPlan(garden) {
       pin.style.left = `${(p.lng ?? 0) * 100}%`;
       pin.style.top  = `${(p.lat ?? 0) * 100}%`;
       pin.innerHTML = `
-        <div class="pin-bubble">${p.photo_urls[0]
-          ? `<img src="${esc(photoSrc(p.photo_urls[0]))}" onerror="this.outerHTML='🌿'"/>`
+        <div class="pin-bubble">${p.photo_file_ids[0]
+          ? `<img src="${esc(photoSrc(p.photo_file_ids[0]))}" onerror="this.outerHTML='🌿'"/>`
           : '🌿'}</div>
         <div class="pin-tail"></div>`;
       pin.title = p.common_name;
@@ -779,7 +776,7 @@ document.getElementById('plantList').addEventListener('click', (e) => {
 });
 document.getElementById('detailContent').addEventListener('click', (e) => {
   const del = e.target.closest('.photo-del-btn');
-  if (del) { window.removePhoto(del.dataset.plantId, del.dataset.url); return; }
+  if (del) { window.removePhoto(del.dataset.plantId, del.dataset.fileId); return; }
   const up = e.target.closest('.photo-upload-btn');
   if (up) window.triggerPhotoUpload(up.dataset.plantId);
 });
@@ -812,7 +809,7 @@ async function uploadWithProgress(file, label) {
 
 async function addPhotoToPlant(plant, file) {
   const result = await uploadWithProgress(file, file.name);
-  const updated = [...plant.photo_urls, result.url];
+  const updated = [...plant.photo_file_ids, result.id];
   if (!await writePhotoUrls(plant, updated)) {
     // No row ever took a reference to these bytes, and nothing sweeps
     // unreferenced files — an upload abandoned here would count against the
@@ -828,7 +825,7 @@ async function addPhotoToPlant(plant, file) {
  * `version` column that has been in the schema since 001_init and was never
  * read.
  *
- * `photo_urls` is a JSON array edited by read-modify-write, so two members
+ * `photo_file_ids` is a JSON array edited by read-modify-write, so two members
  * adding photos at the same time each wrote back a list built from what they
  * loaded — and the second write silently erased the first one's photo, leaving
  * an uploaded file with nothing referencing it. The version check turns that
@@ -844,12 +841,12 @@ async function writePhotoUrls(plant, nextUrls) {
   let current = plant;
   for (let attempt = 0; attempt < PHOTO_WRITE_ATTEMPTS; attempt++) {
     const { changed } = await dbq(
-      `UPDATE app_garden_viewer__plants SET photo_urls = ?, updated_at = ?, version = version + 1
+      `UPDATE app_garden_viewer__plants SET photo_file_ids = ?, updated_at = ?, version = version + 1
         WHERE id = ? AND version = ?`,
       [JSON.stringify(desired), new Date().toISOString(), current.id, current.version],
     );
     if (changed) {
-      plant.photo_urls = desired;
+      plant.photo_file_ids = desired;
       plant.version = Number(current.version) + 1;
       return true;
     }
@@ -860,36 +857,35 @@ async function writePhotoUrls(plant, nextUrls) {
       await hubAlert('This plant was removed while you were editing it.');
       return false;
     }
-    const fresh = { ...rows[0], photo_urls: JSON.parse(rows[0].photo_urls || '[]') };
-    const removed = new Set(current.photo_urls.filter(u => !desired.includes(u)));
-    const added = desired.filter(u => !current.photo_urls.includes(u));
-    desired = [...fresh.photo_urls.filter(u => !removed.has(u)), ...added];
+    const fresh = { ...rows[0], photo_file_ids: JSON.parse(rows[0].photo_file_ids || '[]') };
+    const removed = new Set(current.photo_file_ids.filter(u => !desired.includes(u)));
+    const added = desired.filter(u => !current.photo_file_ids.includes(u));
+    desired = [...fresh.photo_file_ids.filter(u => !removed.has(u)), ...added];
     current = fresh;
   }
   await hubAlert('Someone else is editing this plant’s photos. Try again in a moment.');
   return false;
 }
 
-async function removePhotoFromPlant(plant, url) {
+async function removePhotoFromPlant(plant, fileId) {
   if (!await hubConfirm({ message: 'Remove this photo?', confirmLabel: 'Remove', destructive: true })) return;
-  // Unlink FIRST, delete the bytes second. The old order deleted the file and
-  // then wrote the row: if the write failed, photo_urls still pointed at bytes
-  // that no longer existed and the gallery rendered a permanent broken image
-  // nothing in the UI could clear. Reversed, the worst case is an unreferenced
-  // file — invisible, and only costing quota — instead of a dangling reference.
-  // Nothing sweeps unreferenced files, so every lane that can strand one has to
-  // clean up after itself; here that means the delete below must actually run.
-  const updated = plant.photo_urls.filter(u => u !== url);
+  // Unlink only. `manifest.update_file_list_columns` has the hub read the
+  // pre-image of photo_file_ids, queue whatever the new value drops, and let
+  // the deletion outbox re-check references against the COMMITTED database
+  // before touching R2 — so a file some other plant also names survives.
+  //
+  // This replaces an ordering compromise. Deleting the bytes first left a
+  // dangling reference when the write failed; deleting them second left an
+  // orphan when the delete was lost, and nothing sweeps unreferenced files.
+  // Neither is reachable now: one statement decides both.
+  const updated = plant.photo_file_ids.filter(id => id !== fileId);
   if (!await writePhotoUrls(plant, updated)) return;
-  if (url.includes('/api/files/')) {
-    await files.delete(url.split('/api/files/')[1]).catch(() => {});
-  }
   selectPlant(plant.id);
 }
 
 async function uploadFloorPlan(garden, file) {
   const result = await uploadWithProgress(file, 'floor plan');
-  const previous = garden.plan_image_url;
+  const previous = garden.plan_file_id;
   // Point the garden at the new plan before discarding the old one, for the
   // same reason as photos above: a failed write used to leave the garden
   // referencing a plan whose bytes had already been deleted.
@@ -899,8 +895,8 @@ async function uploadFloorPlan(garden, file) {
   // uploaded bytes. Nothing else ever would: no row names them.
   let changed;
   try {
-    ({ changed } = await dbq(`UPDATE app_garden_viewer__gardens SET plan_image_url = ? WHERE id = ?`,
-      [result.url, garden.id]));
+    ({ changed } = await dbq(`UPDATE app_garden_viewer__gardens SET plan_file_id = ? WHERE id = ?`,
+      [result.id, garden.id]));
   } catch (e) {
     await files.delete(result.id).catch(() => {});
     throw e;
@@ -910,12 +906,11 @@ async function uploadFloorPlan(garden, file) {
     await hubAlert('This garden was removed while the floor plan was uploading.');
     return;
   }
-  garden.plan_image_url = result.url;
-  // Only now — with the row confirmed to point at the new plan — is the old
-  // plan safe to discard.
-  if (previous?.includes('/api/files/')) {
-    await files.delete(previous.split('/api/files/')[1]).catch(() => {});
-  }
+  garden.plan_file_id = result.id;
+  // The replaced plan is the hub's to reclaim: `manifest.update_file_columns`
+  // read plan_file_id's pre-image as part of the UPDATE above. Nothing to do
+  // here, and nothing left to lose if this tab goes away.
+  void previous;
   renderFloorPlan(garden);
 }
 
@@ -948,9 +943,9 @@ window.triggerPlanUpload = (gardenId) => {
   if (_uploadTargetGarden) document.getElementById('plan-input').click();
 };
 
-window.removePhoto = (plantId, url) => {
+window.removePhoto = (plantId, fileId) => {
   const plant = plants.find(p => p.id === plantId);
-  if (plant) removePhotoFromPlant(plant, decodeURIComponent(url));
+  if (plant) removePhotoFromPlant(plant, decodeURIComponent(fileId));
 };
 
 // ── Draggable floor plan pins ──────────────────────────────────────────────
@@ -1107,7 +1102,7 @@ window.submitAddPlant = async () => {
   await dbq(
     `INSERT INTO app_garden_viewer__plants
      (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes,
-      photo_urls, lat, lng, added_by_name, created_at, updated_at)
+      photo_file_ids, lat, lng, added_by_name, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, '[]', NULL, NULL, ?, ?, ?)`,
     [
       id, activeGardenId, name,
@@ -1123,7 +1118,7 @@ window.submitAddPlant = async () => {
 
   const { rows } = await dbq(
     'SELECT * FROM app_garden_viewer__plants WHERE garden_id = ? ORDER BY common_name ASC', [activeGardenId]);
-  plants = rows.map(p => ({ ...p, photo_urls: JSON.parse(p.photo_urls || '[]') }));
+  plants = rows.map(p => ({ ...p, photo_file_ids: JSON.parse(p.photo_file_ids || '[]') }));
   renderList();
 
   const newPlant = plants.find(p => p.id === id);
@@ -1157,7 +1152,7 @@ window.createGarden = async () => {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
   await dbq(
-    'INSERT INTO app_garden_viewer__gardens (id, name, garden_type, plan_image_url, created_at) VALUES (?, ?, ?, NULL, ?)',
+    'INSERT INTO app_garden_viewer__gardens (id, name, garden_type, plan_file_id, created_at) VALUES (?, ?, ?, NULL, ?)',
     [id, name, gardenType, now]
   );
 
