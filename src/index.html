@@ -813,7 +813,13 @@ async function uploadWithProgress(file, label) {
 async function addPhotoToPlant(plant, file) {
   const result = await uploadWithProgress(file, file.name);
   const updated = [...plant.photo_urls, result.url];
-  if (!await writePhotoUrls(plant, updated)) return;
+  if (!await writePhotoUrls(plant, updated)) {
+    // No row ever took a reference to these bytes, and nothing sweeps
+    // unreferenced files — an upload abandoned here would count against the
+    // household's storage quota permanently, invisible to everyone. Undo it.
+    await files.delete(result.id).catch(() => {});
+    return;
+  }
   selectPlant(plant.id);
 }
 
@@ -870,7 +876,9 @@ async function removePhotoFromPlant(plant, url) {
   // then wrote the row: if the write failed, photo_urls still pointed at bytes
   // that no longer existed and the gallery rendered a permanent broken image
   // nothing in the UI could clear. Reversed, the worst case is an unreferenced
-  // file — invisible, and reclaimable — instead of a dangling reference.
+  // file — invisible, and only costing quota — instead of a dangling reference.
+  // Nothing sweeps unreferenced files, so every lane that can strand one has to
+  // clean up after itself; here that means the delete below must actually run.
   const updated = plant.photo_urls.filter(u => u !== url);
   if (!await writePhotoUrls(plant, updated)) return;
   if (url.includes('/api/files/')) {
@@ -885,9 +893,26 @@ async function uploadFloorPlan(garden, file) {
   // Point the garden at the new plan before discarding the old one, for the
   // same reason as photos above: a failed write used to leave the garden
   // referencing a plan whose bytes had already been deleted.
-  await dbq(`UPDATE app_garden_viewer__gardens SET plan_image_url = ? WHERE id = ?`,
-    [result.url, garden.id]);
+  //
+  // The write is not guaranteed to land — the garden may have been deleted
+  // from another device mid-upload — so both failure paths delete the freshly
+  // uploaded bytes. Nothing else ever would: no row names them.
+  let changed;
+  try {
+    ({ changed } = await dbq(`UPDATE app_garden_viewer__gardens SET plan_image_url = ? WHERE id = ?`,
+      [result.url, garden.id]));
+  } catch (e) {
+    await files.delete(result.id).catch(() => {});
+    throw e;
+  }
+  if (!changed) {
+    await files.delete(result.id).catch(() => {});
+    await hubAlert('This garden was removed while the floor plan was uploading.');
+    return;
+  }
   garden.plan_image_url = result.url;
+  // Only now — with the row confirmed to point at the new plan — is the old
+  // plan safe to discard.
   if (previous?.includes('/api/files/')) {
     await files.delete(previous.split('/api/files/')[1]).catch(() => {});
   }
