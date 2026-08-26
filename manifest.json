@@ -10,6 +10,9 @@
   "entrypoint": "index.html",
   "runtime": "static",
   "storage": "db",
+  "preload": {
+    "gardens": {"sql": "SELECT * FROM app_garden_viewer__gardens ORDER BY name ASC"}
+  },
   "db_encryption": "off",
   "category": "general",
   "tags": [
