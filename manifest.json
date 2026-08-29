@@ -11,7 +11,9 @@
   "runtime": "static",
   "storage": "db",
   "preload": {
-    "gardens": {"sql": "SELECT * FROM app_garden_viewer__gardens ORDER BY name ASC"}
+    "gardens": {
+      "sql": "SELECT * FROM app_garden_viewer__gardens ORDER BY name ASC"
+    }
   },
   "db_encryption": "off",
   "category": "general",
@@ -101,10 +103,32 @@
       "kind": "adult_writable"
     },
     "plants": {
-      "kind": "adult_writable"
+      "kind": "adult_writable",
+      "column_write_acls": {
+        "added_by_id": {
+          "writable_by": [
+            "owner"
+          ],
+          "owner_column": "added_by_id",
+          "actions": [
+            "insert"
+          ]
+        }
+      }
     },
     "plant_events": {
-      "kind": "adult_writable"
+      "kind": "adult_writable",
+      "column_write_acls": {
+        "added_by_id": {
+          "writable_by": [
+            "owner"
+          ],
+          "owner_column": "added_by_id",
+          "actions": [
+            "insert"
+          ]
+        }
+      }
     },
     "garden_activity": {
       "kind": "adult_writable",
@@ -112,6 +136,17 @@
         "default": 365,
         "timestamp_column": "created_at",
         "override_key": "activity_history"
+      },
+      "column_write_acls": {
+        "actor_id": {
+          "writable_by": [
+            "owner"
+          ],
+          "owner_column": "actor_id",
+          "actions": [
+            "insert"
+          ]
+        }
       }
     },
     "changes": {
@@ -120,7 +155,7 @@
       "retain_days": {
         "default": 365,
         "timestamp_column": "changed_at",
-        "override_key": "activity_history"
+        "override_key": "sync_ledger"
       }
     }
   },
@@ -143,5 +178,10 @@
     "plants": [
       "photo_file_ids"
     ]
+  },
+  "file_acls": {
+    "write": {
+      "require_role": "adult"
+    }
   }
 }

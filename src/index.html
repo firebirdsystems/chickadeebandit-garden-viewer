@@ -555,12 +555,23 @@ function selectPlant(id) {
       ${IS_ADULT ? `<button class="photo-upload-btn" data-plant-id="${esc(p.id)}">+ Add photo</button>` : ''}
     </div>`;
 
+  const coord = (lat, lng) => {
+    // null/'' must not become 0 via Number() — an unplaced plant would show a
+    // location of 0.00000, 0.00000 (off the coast of Africa).
+    if (lat == null || lng == null || lat === '' || lng === '') return '';
+    const a = Number(lat), b = Number(lng);
+    return Number.isFinite(a) && Number.isFinite(b) ? `${a.toFixed(5)}, ${b.toFixed(5)}` : '';
+  };
   const rows = [
     p.scientific_name && row('Scientific Name', `<i>${esc(p.scientific_name)}</i>`),
     p.plant_type      && row('Type', `<span class="type-badge">${esc(p.plant_type)}</span>`),
     p.bed_name        && row('Bed / Zone', esc(p.bed_name)),
     p.notes           && row('Notes', esc(p.notes).replace(/\n/g, '<br>')),
-    p.lat != null     && row('Location', `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`),
+    // SQLite REAL affinity keeps a non-numeric value as TEXT, so any member
+    // writing a string into lat/lng made .toFixed throw and blanked the whole
+    // detail panel for everyone. Coerce, check, and escape — the raw value is
+    // household-writable and would otherwise be interpolated unescaped.
+    coord(p.lat, p.lng) && row('Location', esc(coord(p.lat, p.lng))),
     p.added_by_name   && row('Added By', esc(p.added_by_name)),
     row('Date Added', new Date(p.created_at).toLocaleDateString()),
   ].filter(Boolean).join('');
