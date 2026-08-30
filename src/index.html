@@ -322,7 +322,7 @@
     <button class="tab-btn active" id="tabList" data-testid="view-list" onclick="setView('list')">List</button>
     <button class="tab-btn" id="tabMap" data-testid="view-map" onclick="setView('map')">Map</button>
   </div>
-  <button class="new-garden-btn" id="newGardenBtn" style="display:none" onclick="openNewGardenModal()">+ New</button>
+  <button class="new-garden-btn" id="newGardenBtn" data-testid="new-garden" style="display:none" onclick="openNewGardenModal()">+ New</button>
 </div>
 
 <!-- New Garden modal -->
@@ -352,7 +352,7 @@
 <!-- Search (list view only) -->
 <div class="search-bar" id="searchBar">
   <input class="search-input" id="searchInput" data-testid="search-input" placeholder="Search plants…" />
-  <button class="add-plant-btn" id="addPlantBtn" style="display:none" onclick="openAddPlantModal()">+ Add Plant</button>
+  <button class="add-plant-btn" id="addPlantBtn" data-testid="add-plant" style="display:none" onclick="openAddPlantModal()">+ Add Plant</button>
 </div>
 
 <!-- Add Plant modal -->

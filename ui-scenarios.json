@@ -39,7 +39,7 @@
         },
         {
           "action": "waitFor",
-          "selector": "[data-testid=\"plant-item\"]"
+          "selector": "[data-testid=\"plant-item\"][data-id=\"ui-plant-1\"]"
         },
         {
           "action": "expectCount",
@@ -75,7 +75,7 @@
         },
         {
           "action": "waitFor",
-          "selector": "[data-testid=\"plant-item\"]"
+          "selector": "[data-testid=\"plant-item\"][data-id=\"ui-plant-1\"]"
         },
         {
           "action": "expectCount",
@@ -101,6 +101,93 @@
           "action": "expectNoText",
           "text": "Tomato",
           "selector": "[data-testid=\"plant-list\"]"
+        }
+      ]
+    },
+    {
+      "name": "a child sees every plant but is offered no way to add one",
+      "members": {
+        "parent": "adult",
+        "kid": "child"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_garden_viewer__gardens (id, name, garden_type, created_at, updated_at) VALUES (?, ?, 'image', datetime('now'), datetime('now'))",
+          "params": [
+            "ui-garden",
+            "Back Yard"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, created_at, updated_at) VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))",
+          "params": [
+            "ui-plant-1",
+            "ui-garden",
+            "Tomato",
+            "Solanum lycopersicum"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, created_at, updated_at) VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))",
+          "params": [
+            "ui-plant-2",
+            "ui-garden",
+            "Basil",
+            "Ocimum basilicum"
+          ]
+        },
+        {
+          "action": "open",
+          "as": "parent"
+        },
+        {
+          "action": "waitFor",
+          "as": "parent",
+          "selector": "[data-testid=\"plant-item\"][data-id=\"ui-plant-1\"]"
+        },
+        {
+          "action": "expectVisible",
+          "as": "parent",
+          "selector": "[data-testid=\"add-plant\"]"
+        },
+        {
+          "action": "expectVisible",
+          "as": "parent",
+          "selector": "[data-testid=\"new-garden\"]"
+        },
+        {
+          "action": "open",
+          "as": "kid"
+        },
+        {
+          "action": "waitFor",
+          "as": "kid",
+          "selector": "[data-testid=\"plant-item\"][data-id=\"ui-plant-1\"]"
+        },
+        {
+          "action": "expectCount",
+          "as": "kid",
+          "selector": "[data-testid=\"plant-item\"]",
+          "count": 2
+        },
+        {
+          "action": "expectText",
+          "as": "kid",
+          "text": "Tomato",
+          "selector": "[data-testid=\"plant-list\"]"
+        },
+        {
+          "action": "expectHidden",
+          "as": "kid",
+          "selector": "[data-testid=\"add-plant\"]"
+        },
+        {
+          "action": "expectHidden",
+          "as": "kid",
+          "selector": "[data-testid=\"new-garden\"]"
         }
       ]
     }
