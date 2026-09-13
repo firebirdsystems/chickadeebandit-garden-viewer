@@ -51,8 +51,7 @@
     }
   },
   "cdn_whitelist": [
-    "https://unpkg.com",
-    "https://*.tile.openstreetmap.org"
+    "https://unpkg.com"
   ],
   "resource_limits": {
     "max_db_bytes": 52428800,

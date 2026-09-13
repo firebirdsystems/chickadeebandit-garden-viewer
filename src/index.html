@@ -643,7 +643,15 @@ function renderLeafletMap() {
 
   if (!leafletMap) {
     leafletMap = L.map('map');
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // Tiles come from the hub, not straight from OSM. Their tile usage policy
+    // disallows both halves of what this used to send — the deprecated {s}
+    // sharding subdomains, and a client with no identifying User-Agent, which a
+    // browser cannot supply — and every map in the product was being served
+    // their "blocked" image instead of a tile. The hub proxy adds the User-Agent
+    // and a shared cache in front of the upstream. Root-relative on purpose: the
+    // same URL resolves whether this app is framed under /run/:appId on the hub
+    // origin or served from its own {appId}.apps.* origin.
+    L.tileLayer('/api/tiles/{z}/{x}/{y}', {
       attribution: '© OpenStreetMap contributors', maxZoom: 19,
     }).addTo(leafletMap);
   }
