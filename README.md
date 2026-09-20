@@ -1,6 +1,6 @@
 # Map My Garden
 
-A [Chickadee Bandit](http://chickadeebandit.com) app.
+A [Chickadee Bandit](https://chickadeebandit.com/app-library/garden-viewer) app.
 
 Browse your household gardens and plants on an interactive map. Add and manage plants from the [Map My Garden](https://mapmygarden.app) iOS app — this viewer keeps everyone in the family in sync.
 
