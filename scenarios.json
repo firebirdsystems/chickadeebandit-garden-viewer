@@ -1,0 +1,173 @@
+{
+  "scenarios": [
+    {
+      "name": "gardens and plants are adult-writable: a child can browse but not add, edit, or remove",
+      "members": { "parent": "adult", "kid": "child" },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_garden_viewer__gardens (id, name, created_at, updated_at) VALUES ('g1', 'Backyard', '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z')"
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, added_by_id, created_at, updated_at) VALUES ('p1', 'g1', 'Tomato', ?, '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z')",
+          "params": ["{{parent}}"]
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "SELECT id FROM app_garden_viewer__plants",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "p1" }] }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "INSERT INTO app_garden_viewer__gardens (id, name, created_at, updated_at) VALUES ('g2', 'Kid Garden', '2026-01-02T00:00:00Z', '2026-01-02T00:00:00Z')",
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "UPDATE app_garden_viewer__plants SET common_name = 'Weed' WHERE id = 'p1'",
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "DELETE FROM app_garden_viewer__plants WHERE id = 'p1'",
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "SELECT id, common_name FROM app_garden_viewer__plants",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "p1", "common_name": "Tomato" }] }
+        },
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "INSERT INTO app_garden_viewer__gardens (id, name, created_at, updated_at) VALUES ('g2', 'Front Bed', '2026-01-02T00:00:00Z', '2026-01-02T00:00:00Z')",
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "SELECT id FROM app_garden_viewer__gardens",
+          "expect": { "status": 200, "rowCount": 2 }
+        }
+      ]
+    },
+    {
+      "name": "an adult cannot attribute a new plant or journal entry to another member",
+      "members": { "gardener": "adult", "partner": "adult" },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_garden_viewer__gardens (id, name, created_at, updated_at) VALUES ('g1', 'Backyard', '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z')"
+        },
+        {
+          "action": "db",
+          "as": "gardener",
+          "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, added_by_id, created_at, updated_at) VALUES (?, 'g1', 'Basil', ?, '2026-01-02T00:00:00Z', '2026-01-02T00:00:00Z')",
+          "params": ["p_forged", "{{partner}}"],
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "gardener",
+          "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, added_by_id, created_at, updated_at) VALUES (?, 'g1', 'Basil', ?, '2026-01-02T00:00:00Z', '2026-01-02T00:00:00Z')",
+          "params": ["p_own", "{{gardener}}"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "gardener",
+          "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_id, created_at) VALUES (?, 'p_own', 'g1', 'watered', '2026-01-03', ?, '2026-01-03T00:00:00Z')",
+          "params": ["e_forged", "{{partner}}"],
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "gardener",
+          "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_id, created_at) VALUES (?, 'p_own', 'g1', 'watered', '2026-01-03', ?, '2026-01-03T00:00:00Z')",
+          "params": ["e_own", "{{gardener}}"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "partner",
+          "sql": "SELECT id FROM app_garden_viewer__plants",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "p_own" }] }
+        },
+        {
+          "action": "db",
+          "as": "partner",
+          "sql": "SELECT id FROM app_garden_viewer__plant_events",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "e_own" }] }
+        }
+      ]
+    },
+    {
+      "name": "the changes sync ledger is readable by everyone but cannot be written with raw SQL",
+      "members": { "parent": "adult", "kid": "child" },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_garden_viewer__changes (id, entity_type, entity_id, operation, changed_at) VALUES ('ch1', 'plants', 'p1', 'upsert', '2026-01-01T00:00:00Z')"
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "SELECT id, entity_type, operation FROM app_garden_viewer__changes",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "ch1", "operation": "upsert" }] }
+        },
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "INSERT INTO app_garden_viewer__changes (id, entity_type, entity_id, operation, changed_at) VALUES ('ch2', 'plants', 'p2', 'upsert', '2026-01-02T00:00:00Z')",
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "DELETE FROM app_garden_viewer__changes WHERE id = 'ch1'",
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "parent",
+          "sql": "SELECT id FROM app_garden_viewer__changes",
+          "expect": { "status": 200, "rowCount": 1 }
+        }
+      ]
+    },
+    {
+      "name": "all_plants export lists every plant joined with its garden",
+      "members": { "member": "adult" },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_garden_viewer__gardens (id, name, garden_type, created_at, updated_at) VALUES ('g1', 'Backyard', 'map', '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z'), ('g2', 'Balcony', 'list', '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z')"
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, created_at, updated_at) VALUES ('p1', 'g1', 'Tomato', '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z'), ('p2', 'g2', 'Mint', '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z')"
+        },
+        {
+          "action": "named",
+          "as": "member",
+          "kind": "query",
+          "name": "all_plants",
+          "expect": {
+            "status": 200,
+            "rowCount": 2,
+            "rowsContain": [
+              { "id": "p1", "common_name": "Tomato", "garden_name": "Backyard" },
+              { "id": "p2", "common_name": "Mint", "garden_name": "Balcony", "garden_type": "list" }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
