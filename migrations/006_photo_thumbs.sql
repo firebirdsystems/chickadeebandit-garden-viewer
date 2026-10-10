@@ -1,0 +1,14 @@
+-- Small copies of a plant's photos, for the list and the map pins.
+--
+-- `photo_thumbs` is a JSON object that maps a photo's file id to the file id of
+-- its small copy: {"<photo id>": "<small copy id>"}. A photo with no small copy
+-- has no entry. A row from before this column has `{}`, and the app draws the
+-- photo itself.
+--
+-- The column is deliberately not named like a file column and is not declared
+-- in any manifest file key. A small copy belongs to its photo: when a photo's
+-- id leaves `photo_file_ids` (the plant is deleted, or the list is rewritten),
+-- the hub deletes the photo and the copies made from it. An entry left behind
+-- in this object is harmless, because the app only looks one up by an id that
+-- is still in the list.
+ALTER TABLE app_garden_viewer__plants ADD COLUMN photo_thumbs TEXT NOT NULL DEFAULT '{}';

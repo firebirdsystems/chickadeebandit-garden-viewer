@@ -162,6 +162,24 @@ describe("file ids, not URLs", () => {
     expect(manifest.delete_file_list_columns?.plants).toContain("photo_file_ids");
   });
 
+  it("leaves the small copies to the hub: photo_thumbs is in no file key", () => {
+    // A small copy is deleted with its photo, so the map is not a file column.
+    for (const key of ["update_file_columns", "update_file_list_columns", "delete_file_columns", "delete_file_list_columns"]) {
+      expect(manifest[key]?.plants ?? []).not.toContain("photo_thumbs");
+    }
+  });
+
+  it("writes photo_thumbs in every statement that writes the photo list", () => {
+    const writes = clientSrc.match(/(?:UPDATE|INSERT INTO) app_garden_viewer__plants[^`]*photo_file_ids[^`]*`/g) ?? [];
+    expect(writes).toHaveLength(2);
+    for (const sql of writes) expect(sql).toContain("photo_thumbs");
+  });
+
+  it("asks for a small copy of a plant photo, not of the floor plan", () => {
+    expect(clientSrc).toContain("uploadWithProgress(file, file.name, { thumbnail: true })");
+    expect(clientSrc).toContain("uploadWithProgress(file, 'floor plan')");
+  });
+
   it("stores the upload's id, never its url", () => {
     expect(clientSrc).not.toContain("result.url");
   });

@@ -400,7 +400,7 @@
 </div>
 
 <input type="file" id="photo-input" accept="image/jpeg,image/png,image/heic,image/heif,image/webp" style="display:none" />
-<input type="file" id="plan-input"  accept="image/jpeg,image/png,image/heic,image/heif,image/webp,application/pdf" style="display:none" />
+<input type="file" id="plan-input"  accept="image/jpeg,image/png,image/heic,image/heif,image/webp" style="display:none" />
 <div class="upload-bar" id="upload-bar" style="display:none">
   <span id="upload-label">Uploading…</span>
   <div class="upload-track"><div class="upload-fill" id="upload-fill" style="width:0%"></div></div>
@@ -414,7 +414,7 @@ import { esc, isAdult, createDbHelper, createFilesHelper, hubAlert, hubConfirm, 
 document.getElementById('toolbarGlyph').innerHTML = glyph('sprout');
 window.plantGlyph = () => glyph('sprout');
 window.plantMarkerGlyph = () => glyph('sprout', { color: '#fff', accent: '#fff' });
-import { searchableFields } from "./logic.js";
+import { searchableFields, parsePhotoThumbs, parsePhotoIds, tilePhotoId, photoThumbsFor, hasPosition } from "./logic.js";
 
 // ── State ──────────────────────────────────────────────────────────────────
 
@@ -453,6 +453,63 @@ function photoSrc(fileId) {
   return fileId ? files.url(fileId) : '';
 }
 
+/** `src` for a plant's first photo at thumbnail size: its small copy when the
+ *  plant has one recorded, otherwise the photo itself. */
+function thumbSrc(plant) {
+  return photoSrc(tilePhotoId(plant.photo_file_ids[0], plant.photo_thumbs));
+}
+
+/** A plant row as the app holds it: the two JSON columns parsed. */
+function readPlant(row) {
+  return {
+    ...row,
+    photo_file_ids: parsePhotoIds(row.photo_file_ids),
+    photo_thumbs: parsePhotoThumbs(row.photo_thumbs),
+  };
+}
+
+// ── Change feed ────────────────────────────────────────────────────────────
+
+/**
+ * Tells the Chickadee Garden companion that a garden or plant changed.
+ *
+ * The companion keeps its own copy of the household's gardens and brings it up
+ * to date by reading the `changes` feed, never by re-reading the tables. A row
+ * written here without an entry in that feed is one it does not learn about
+ * until its next full reload. Rows are appended through the hub's append-record
+ * endpoint (manifest `append_only_records.changes`); app SQL cannot write the
+ * table.
+ *
+ * A failed append is logged and not raised: the write it describes has already
+ * landed and is correct for everyone using this page.
+ */
+async function recordChange(entityType, entityId, operation = 'upsert') {
+  const base = window.__APPEND_RECORD_URL;
+  if (!base) return;
+  try {
+    const res = await fetch(`${base}/changes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ entity_type: entityType, entity_id: entityId, operation }),
+    });
+    if (!res.ok) console.warn('Garden change feed append failed:', res.status);
+  } catch (e) {
+    console.warn('Garden change feed append failed:', e);
+  }
+}
+
+/** Runs a member's action and tells them if it fails, instead of leaving the
+ *  failure as an unhandled rejection nobody sees. */
+function reporting(what, fn) {
+  return async (...args) => {
+    try {
+      return await fn(...args);
+    } catch (e) {
+      await hubAlert(`${what}: ${e?.message ?? 'something went wrong.'}`);
+    }
+  };
+}
+
 // ── Schema ─────────────────────────────────────────────────────────────────
 
 async function initSchema() {
@@ -466,7 +523,7 @@ async function initSchema() {
 // the list orders it. `id` breaks ties so both statements pick the same one.
 const FIRST_GARDEN_PLANTS_SQL = 'SELECT * FROM app_garden_viewer__plants WHERE garden_id = (SELECT id FROM app_garden_viewer__gardens ORDER BY name ASC, id ASC LIMIT 1) ORDER BY common_name ASC';
 
-async function loadGardens(withFirstPlants = false) {
+async function loadGardens(withFirstPlants = false, selectId = null) {
   const firstPlants = withFirstPlants ? dbq(FIRST_GARDEN_PLANTS_SQL) : null;
   firstPlants?.catch(() => {});
   const { rows } = await dbq('SELECT * FROM app_garden_viewer__gardens ORDER BY name ASC, id ASC');
@@ -475,6 +532,15 @@ async function loadGardens(withFirstPlants = false) {
   sel.innerHTML = '';
   if (!rows.length) {
     sel.innerHTML = '<option>No gardens yet</option>';
+    activeGardenId = null;
+    plants = [];
+    updateControls();
+    document.getElementById('plantList').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">${chickadee('nest')}</div>
+        <div class="empty-title">No gardens yet</div>
+        <div class="empty-msg">${IS_ADULT ? 'Tap + New to create your first garden.' : 'An adult can create the first garden.'}</div>
+      </div>`;
     return;
   }
   rows.forEach(g => {
@@ -483,14 +549,28 @@ async function loadGardens(withFirstPlants = false) {
     opt.textContent = g.name;
     sel.appendChild(opt);
   });
-  sel.onchange = () => selectGarden(sel.value);
-  selectGarden(rows[0].id, firstPlants);
+  sel.onchange = reporting('Could not open that garden', () => selectGarden(sel.value));
+  // Awaited, so a caller that goes on to use `plants` (the deep link) sees them.
+  const target = selectId && rows.some(g => g.id === selectId) ? selectId : rows[0].id;
+  await selectGarden(target, target === rows[0].id ? firstPlants : null);
 }
+
+/** Controls that depend on who is looking and on there being a garden open. */
+function updateControls() {
+  document.getElementById('newGardenBtn').style.display = IS_ADULT ? '' : 'none';
+  document.getElementById('addPlantBtn').style.display = IS_ADULT && activeGardenId ? '' : 'none';
+}
+
+// Each call takes the next number; an answer for a garden the member has
+// already left is dropped instead of replacing the plants of the one shown.
+let gardenLoadSeq = 0;
 
 async function selectGarden(id, plantsRead = null) {
   activeGardenId = id;
+  const seq = ++gardenLoadSeq;
   document.getElementById('gardenSelect').value = id;
   closeDetail();
+  updateControls();
   // `plantsRead` is the read-ahead for the first garden. It is used only if
   // it answered with rows and every row is this garden's; otherwise the
   // plants are read by id as before. An empty answer names no garden, so it
@@ -504,7 +584,8 @@ async function selectGarden(id, plantsRead = null) {
     'SELECT * FROM app_garden_viewer__plants WHERE garden_id = ? AND (1=1) ORDER BY common_name ASC',
     [id]
   )).rows;
-  plants = rows.map(p => ({ ...p, photo_file_ids: JSON.parse(p.photo_file_ids || '[]') }));
+  if (seq !== gardenLoadSeq) return;
+  plants = rows.map(readPlant);
   renderList();
   if (currentView === 'map' || currentView === 'floorplan') renderMap();
   updateMapTabLabel();
@@ -535,7 +616,7 @@ function renderList() {
 
   el.innerHTML = filtered.map(p => {
     const thumb = p.photo_file_ids[0]
-      ? `<div class="plant-thumb"><img src="${esc(photoSrc(p.photo_file_ids[0]))}" loading="lazy" onerror="this.parentElement.innerHTML=window.plantGlyph()"/></div>`
+      ? `<div class="plant-thumb"><img src="${esc(thumbSrc(p))}" loading="lazy" onerror="this.parentElement.innerHTML=window.plantGlyph()"/></div>`
       : `<div class="plant-thumb">${glyph('sprout')}</div>`;
     const badge = p.plant_type ? `<span class="type-badge">${esc(p.plant_type)}</span>` : '';
     const meta = [p.bed_name, p.added_by_name ? `by ${p.added_by_name}` : ''].filter(Boolean).join(' · ');
@@ -558,9 +639,9 @@ function selectPlant(id) {
   if (selectedPlantId && selectedPlantId !== id) {
     document.querySelector(`.plant-item[data-id="${CSS.escape(selectedPlantId)}"]`)?.classList.remove('selected');
   }
-  selectedPlantId = id;
   const p = plants.find(pl => pl.id === id);
-  if (!p) return;
+  if (!p) { selectedPlantId = null; return; }
+  selectedPlantId = id;
   document.querySelector(`.plant-item[data-id="${CSS.escape(id)}"]`)?.classList.add('selected');
 
   const photoImgs = p.photo_file_ids.map(fid => `
@@ -661,7 +742,9 @@ function onMapTabClick() {
 // ── Leaflet map ────────────────────────────────────────────────────────────
 
 function renderLeafletMap() {
-  const pinned = plants.filter(p => p.lat != null && p.lng != null);
+  // Only plants with a usable position: a coordinate that is not a number
+  // makes Leaflet throw and takes the whole map with it.
+  const pinned = plants.filter(hasPosition).map(p => ({ ...p, lat: Number(p.lat), lng: Number(p.lng) }));
 
   if (!leafletMap) {
     leafletMap = L.map('map');
@@ -699,13 +782,14 @@ function renderLeafletMap() {
         font-size:1.1rem;box-shadow:0 2px 6px rgba(0,0,0,.3);
         overflow:hidden;border:2px solid #fff;
       ">${p.photo_file_ids[0]
-        ? `<img src="${esc(photoSrc(p.photo_file_ids[0]))}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.outerHTML=window.plantMarkerGlyph()"/>`
+        ? `<img src="${esc(thumbSrc(p))}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.outerHTML=window.plantMarkerGlyph()"/>`
         : glyph('sprout', { color: '#fff', accent: '#fff' })
       }</div>`,
       iconSize: [32, 32],
       iconAnchor: [16, 16],
     });
-    const marker = L.marker([p.lat, p.lng], { icon, draggable: true })
+    // Only adults may move a plant; for anyone else the hub refuses the write.
+    const marker = L.marker([p.lat, p.lng], { icon, draggable: IS_ADULT })
       .addTo(leafletMap)
       .bindPopup(`<strong>${esc(p.common_name)}</strong>${p.scientific_name ? `<br><i>${esc(p.scientific_name)}</i>` : ''}`);
     marker._plantId = p.id;
@@ -761,16 +845,17 @@ function renderFloorPlan(garden) {
   }
 
   img.onload = () => {
-    const pinned = plants.filter(p => p.lat != null && p.lng != null);
+    const pinned = plants.filter(hasPosition);
     pinned.forEach(p => {
       const pin = document.createElement('div');
       pin.className = 'floorplan-pin';
       pin.dataset.plantId = p.id;
-      pin.style.left = `${(p.lng ?? 0) * 100}%`;
-      pin.style.top  = `${(p.lat ?? 0) * 100}%`;
+      pin.style.left = `${Number(p.lng) * 100}%`;
+      pin.style.top  = `${Number(p.lat) * 100}%`;
+      if (!IS_ADULT) pin.style.cursor = 'pointer';
       pin.innerHTML = `
         <div class="pin-bubble">${p.photo_file_ids[0]
-          ? `<img src="${esc(photoSrc(p.photo_file_ids[0]))}" onerror="this.outerHTML=window.plantGlyph()"/>`
+          ? `<img src="${esc(thumbSrc(p))}" onerror="this.outerHTML=window.plantGlyph()"/>`
           : glyph('sprout')}</div>
         <div class="pin-tail"></div>`;
       pin.title = p.common_name;
@@ -828,7 +913,7 @@ document.getElementById('floorplanContainer').addEventListener('click', (e) => {
 
 // ── Photo / floor-plan upload ──────────────────────────────────────────────
 
-async function uploadWithProgress(file, label) {
+async function uploadWithProgress(file, label, options = {}) {
   const bar   = document.getElementById('upload-bar');
   const fill  = document.getElementById('upload-fill');
   const lbl   = document.getElementById('upload-label');
@@ -837,28 +922,42 @@ async function uploadWithProgress(file, label) {
   fill.style.width  = '0%';
 
   try {
-    const result = await files.upload(file, (e) => {
-      if (e.lengthComputable) {
-        fill.style.width = `${Math.round(e.loaded / e.total * 100)}%`;
-      }
+    const result = await files.upload(file, {
+      ...options,
+      onProgress: (e) => {
+        if (e.lengthComputable) {
+          fill.style.width = `${Math.round(e.loaded / e.total * 100)}%`;
+        }
+      },
     });
-    return result; // { id, url }
+    return result; // { id, url, thumbnailId? }
   } finally {
     bar.style.display = 'none';
   }
 }
 
 async function addPhotoToPlant(plant, file) {
-  const result = await uploadWithProgress(file, file.name);
+  // Ask for a small copy as well: the list and the map pins draw that. The
+  // reply has no `thumbnailId` when none was kept, and the photo then has no
+  // entry in `photo_thumbs`.
+  const result = await uploadWithProgress(file, file.name, { thumbnail: true });
   const updated = [...plant.photo_file_ids, result.id];
-  if (!await writePhotoUrls(plant, updated)) {
-    // No row ever took a reference to these bytes, and nothing sweeps
-    // unreferenced files — an upload abandoned here would count against the
-    // household's storage quota permanently, invisible to everyone. Undo it.
-    await files.delete(result.id).catch(() => {});
-    return;
+  const newThumbs = result.thumbnailId ? { [result.id]: result.thumbnailId } : {};
+  // No row has taken a reference to these bytes yet, and nothing sweeps
+  // unreferenced files — an upload abandoned here would count against the
+  // household's storage quota permanently, invisible to everyone. Undo it
+  // whether the write was turned away or failed outright.
+  let written = false;
+  try {
+    written = await writePhotoUrls(plant, updated, newThumbs);
+  } finally {
+    if (!written) await files.delete(result.id).catch(() => {});
   }
-  selectPlant(plant.id);
+  if (!written) return;
+  await recordChange('plants', plant.id);
+  // Redraw the plant only if the member is still looking at it.
+  if (selectedPlantId === plant.id) selectPlant(plant.id);
+  renderList();
 }
 
 /**
@@ -873,21 +972,28 @@ async function addPhotoToPlant(plant, file) {
  * into a retry: the UPDATE only lands on the row version the caller read, and
  * a mismatch reloads and re-applies the edit to the current list.
  *
+ * `photo_thumbs` is written by the same statement, holding the small copies of
+ * the photos in the list being written and no others. `newThumbs` names the
+ * small copies of photos this edit adds.
+ *
  * Returns false if the write could not be completed, having already told the
  * member why.
  */
 const PHOTO_WRITE_ATTEMPTS = 3;
-async function writePhotoUrls(plant, nextUrls) {
+async function writePhotoUrls(plant, nextUrls, newThumbs = {}) {
   let desired = nextUrls;
   let current = plant;
+  let thumbs = { ...plant.photo_thumbs, ...newThumbs };
   for (let attempt = 0; attempt < PHOTO_WRITE_ATTEMPTS; attempt++) {
+    const desiredThumbs = photoThumbsFor(desired, thumbs);
     const { changed } = await dbq(
-      `UPDATE app_garden_viewer__plants SET photo_file_ids = ?, updated_at = ?, version = version + 1
+      `UPDATE app_garden_viewer__plants SET photo_file_ids = ?, photo_thumbs = ?, updated_at = ?, version = version + 1
         WHERE id = ? AND version = ?`,
-      [JSON.stringify(desired), new Date().toISOString(), current.id, current.version],
+      [JSON.stringify(desired), JSON.stringify(desiredThumbs), new Date().toISOString(), current.id, current.version],
     );
     if (changed) {
       plant.photo_file_ids = desired;
+      plant.photo_thumbs = desiredThumbs;
       plant.version = Number(current.version) + 1;
       return true;
     }
@@ -898,10 +1004,11 @@ async function writePhotoUrls(plant, nextUrls) {
       await hubAlert('This plant was removed while you were editing it.');
       return false;
     }
-    const fresh = { ...rows[0], photo_file_ids: JSON.parse(rows[0].photo_file_ids || '[]') };
+    const fresh = readPlant(rows[0]);
     const removed = new Set(current.photo_file_ids.filter(u => !desired.includes(u)));
     const added = desired.filter(u => !current.photo_file_ids.includes(u));
     desired = [...fresh.photo_file_ids.filter(u => !removed.has(u)), ...added];
+    thumbs = { ...fresh.photo_thumbs, ...newThumbs };
     current = fresh;
   }
   await hubAlert('Someone else is editing this plant’s photos. Try again in a moment.');
@@ -921,10 +1028,13 @@ async function removePhotoFromPlant(plant, fileId) {
   // Neither is reachable now: one statement decides both.
   const updated = plant.photo_file_ids.filter(id => id !== fileId);
   if (!await writePhotoUrls(plant, updated)) return;
-  selectPlant(plant.id);
+  await recordChange('plants', plant.id);
+  if (selectedPlantId === plant.id) selectPlant(plant.id);
+  renderList();
 }
 
 async function uploadFloorPlan(garden, file) {
+  // No small copy: the plan is drawn large, from the file itself.
   const result = await uploadWithProgress(file, 'floor plan');
   const previous = garden.plan_file_id;
   // Point the garden at the new plan before discarding the old one, for the
@@ -936,8 +1046,11 @@ async function uploadFloorPlan(garden, file) {
   // uploaded bytes. Nothing else ever would: no row names them.
   let changed;
   try {
-    ({ changed } = await dbq(`UPDATE app_garden_viewer__gardens SET plan_file_id = ? WHERE id = ?`,
-      [result.id, garden.id]));
+    // `version` moves with every write: the companion app writes this row
+    // only at the version it last read.
+    ({ changed } = await dbq(
+      `UPDATE app_garden_viewer__gardens SET plan_file_id = ?, updated_at = ?, version = version + 1 WHERE id = ?`,
+      [result.id, new Date().toISOString(), garden.id]));
   } catch (e) {
     await files.delete(result.id).catch(() => {});
     throw e;
@@ -948,6 +1061,7 @@ async function uploadFloorPlan(garden, file) {
     return;
   }
   garden.plan_file_id = result.id;
+  await recordChange('gardens', garden.id);
   // The replaced plan is the hub's to reclaim: `manifest.update_file_columns`
   // read plan_file_id's pre-image as part of the UPDATE above. Nothing to do
   // here, and nothing left to lose if this tab goes away.
@@ -963,15 +1077,17 @@ let _uploadTargetGarden = null;
 document.getElementById('photo-input').addEventListener('change', async (e) => {
   const file = e.target.files?.[0];
   e.target.value = '';
-  if (file && _uploadTargetPlant) await addPhotoToPlant(_uploadTargetPlant, file);
+  const plant = _uploadTargetPlant;
   _uploadTargetPlant = null;
+  if (file && plant) await reporting('Could not add the photo', addPhotoToPlant)(plant, file);
 });
 
 document.getElementById('plan-input').addEventListener('change', async (e) => {
   const file = e.target.files?.[0];
   e.target.value = '';
-  if (file && _uploadTargetGarden) await uploadFloorPlan(_uploadTargetGarden, file);
+  const garden = _uploadTargetGarden;
   _uploadTargetGarden = null;
+  if (file && garden) await reporting('Could not upload the floor plan', uploadFloorPlan)(garden, file);
 });
 
 window.triggerPhotoUpload = (plantId) => {
@@ -986,7 +1102,7 @@ window.triggerPlanUpload = (gardenId) => {
 
 window.removePhoto = (plantId, fileId) => {
   const plant = plants.find(p => p.id === plantId);
-  if (plant) removePhotoFromPlant(plant, decodeURIComponent(fileId));
+  if (plant) reporting('Could not remove the photo', removePhotoFromPlant)(plant, decodeURIComponent(fileId));
 };
 
 // ── Draggable floor plan pins ──────────────────────────────────────────────
@@ -995,6 +1111,9 @@ function makePinDraggable(pin, plantId, container) {
   let startX, startY, startLng, startLat, didDrag = false;
 
   pin.addEventListener('pointerdown', (e) => {
+    // Only adults may move a plant. Without the capture taken below, the move
+    // and release handlers do nothing and the click still opens the plant.
+    if (!IS_ADULT) return;
     e.stopPropagation();
     e.preventDefault();
     pin.setPointerCapture(e.pointerId);
@@ -1037,10 +1156,23 @@ function makePinDraggable(pin, plantId, container) {
 // ── Save plant position ────────────────────────────────────────────────────
 
 async function savePlantPosition(plantId, lat, lng) {
-  await dbq('UPDATE app_garden_viewer__plants SET lat = ?, lng = ?, updated_at = ? WHERE id = ?',
-    [lat, lng, new Date().toISOString(), plantId]);
+  try {
+    // `version` moves with every write: the companion app and the photo
+    // writes above both write this row only at the version they last read.
+    const { changed } = await dbq(
+      'UPDATE app_garden_viewer__plants SET lat = ?, lng = ?, updated_at = ?, version = version + 1 WHERE id = ?',
+      [lat, lng, new Date().toISOString(), plantId]);
+    if (!changed) throw new Error('this plant is no longer in the garden.');
+  } catch (e) {
+    // The pin or marker has already been drawn where it was dropped. Put
+    // everything back where the garden actually has it.
+    renderMap();
+    await hubAlert(`Could not move the plant: ${e?.message ?? 'something went wrong.'}`);
+    return;
+  }
   const p = plants.find(pl => pl.id === plantId);
-  if (p) { p.lat = lat; p.lng = lng; }
+  if (p) { p.lat = lat; p.lng = lng; p.version = Number(p.version) + 1; }
+  await recordChange('plants', plantId);
 
   // Update only the moved element rather than rebuilding all markers/pins
   if (currentView === 'map') {
@@ -1134,37 +1266,50 @@ document.getElementById('addPlantModal').addEventListener('click', (e) => {
   if (e.target === e.currentTarget) window.closeAddPlantModal();
 });
 
-window.submitAddPlant = async () => {
+window.submitAddPlant = reporting('Could not add the plant', async () => {
   const name = document.getElementById('plantNameInput').value.trim();
-  if (!name || !activeGardenId) return;
+  const submit = document.getElementById('addPlantSubmitBtn');
+  // The button is off while the write is in flight, so a second tap does not
+  // add the plant twice.
+  if (!name || !activeGardenId || submit.disabled) return;
+  submit.disabled = true;
 
   const id  = crypto.randomUUID();
+  const gardenId = activeGardenId;
   const now = new Date().toISOString();
-  await dbq(
-    `INSERT INTO app_garden_viewer__plants
-     (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes,
-      photo_file_ids, lat, lng, added_by_name, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, '[]', NULL, NULL, ?, ?, ?)`,
-    [
-      id, activeGardenId, name,
-      document.getElementById('plantSciInput').value.trim()  || null,
-      document.getElementById('plantTypeInput').value.trim() || null,
-      document.getElementById('plantBedInput').value.trim()  || null,
-      document.getElementById('plantNotesInput').value.trim()|| null,
-      MEM?.display_name || null, now, now,
-    ]
-  );
+  try {
+    await dbq(
+      `INSERT INTO app_garden_viewer__plants
+       (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes,
+        photo_file_ids, photo_thumbs, lat, lng, added_by_id, added_by_name, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, '[]', '{}', NULL, NULL, ?, ?, ?, ?)`,
+      [
+        id, gardenId, name,
+        document.getElementById('plantSciInput').value.trim()  || null,
+        document.getElementById('plantTypeInput').value.trim() || null,
+        document.getElementById('plantBedInput').value.trim()  || null,
+        document.getElementById('plantNotesInput').value.trim()|| null,
+        MEM?.id ?? null, MEM?.name ?? null, now, now,
+      ]
+    );
+  } catch (e) {
+    submit.disabled = false;
+    throw e;
+  }
+  await recordChange('plants', id);
 
   window.closeAddPlantModal();
+  if (activeGardenId !== gardenId) return;
 
   const { rows } = await dbq(
-    'SELECT * FROM app_garden_viewer__plants WHERE garden_id = ? ORDER BY common_name ASC', [activeGardenId]);
-  plants = rows.map(p => ({ ...p, photo_file_ids: JSON.parse(p.photo_file_ids || '[]') }));
+    'SELECT * FROM app_garden_viewer__plants WHERE garden_id = ? ORDER BY common_name ASC', [gardenId]);
+  if (activeGardenId !== gardenId) return;
+  plants = rows.map(readPlant);
   renderList();
 
   const newPlant = plants.find(p => p.id === id);
   if (newPlant) enterPlacementMode(newPlant);
-};
+});
 
 // ── New garden ─────────────────────────────────────────────────────────────
 
@@ -1185,22 +1330,31 @@ window.updateCreateBtn = () => {
   document.getElementById('createGardenBtn').disabled = name.length === 0;
 };
 
-window.createGarden = async () => {
+window.createGarden = reporting('Could not create the garden', async () => {
   const name = document.getElementById('gardenNameInput').value.trim();
   const gardenType = document.getElementById('gardenTypeInput').value;
-  if (!name) return;
+  const create = document.getElementById('createGardenBtn');
+  if (!name || create.disabled) return;
+  create.disabled = true;
 
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
-  await dbq(
-    'INSERT INTO app_garden_viewer__gardens (id, name, garden_type, plan_file_id, created_at) VALUES (?, ?, ?, NULL, ?)',
-    [id, name, gardenType, now]
-  );
+  try {
+    await dbq(
+      'INSERT INTO app_garden_viewer__gardens (id, name, garden_type, plan_file_id, created_at) VALUES (?, ?, ?, NULL, ?)',
+      [id, name, gardenType, now]
+    );
+  } catch (e) {
+    create.disabled = false;
+    throw e;
+  }
+  await recordChange('gardens', id);
 
   closeNewGardenModal();
-  await loadGardens();
-  selectGarden(id);
-};
+  // One load that opens the new garden. Loading the list and then selecting
+  // started two plant reads at once, and the first garden's could land last.
+  await loadGardens(false, id);
+});
 
 // Close modal on backdrop click
 document.getElementById('newGardenModal').addEventListener('click', (e) => {
@@ -1221,9 +1375,16 @@ document.addEventListener('keydown', (e) => {
 
 // ── Deep link ──────────────────────────────────────────────────────────────
 
-function handleDeepLink() {
+async function handleDeepLink() {
   const plantId = new URLSearchParams(window.location.search).get("plantId");
   if (!plantId) return;
+  // The plant may be in a garden other than the one opened first.
+  if (!plants.some(p => p.id === plantId)) {
+    const { rows } = await dbq('SELECT garden_id FROM app_garden_viewer__plants WHERE id = ?', [plantId]);
+    const gardenId = rows?.[0]?.garden_id;
+    if (!gardenId || !gardens.some(g => g.id === gardenId)) return;
+    await selectGarden(gardenId);
+  }
   selectPlant(plantId);
 }
 
@@ -1233,14 +1394,21 @@ async function init() {
   try {
     await initSchema();
     await loadGardens(true);
-    if (IS_ADULT) document.getElementById('newGardenBtn').style.display = '';
-    if (IS_ADULT) document.getElementById('addPlantBtn').style.display = '';
+    updateControls();
+    await handleDeepLink();
   } catch (e) {
     console.error('Garden viewer init failed:', e);
+    // Say so on the page: the console is not somewhere a member looks.
+    document.getElementById('plantList').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">${chickadee('perched')}</div>
+        <div class="empty-title">The garden couldn't load.</div>
+        <div class="empty-msg">${esc(e?.message ?? 'Something went wrong.')}</div>
+        <button class="add-plant-btn" style="margin-top:14px" onclick="window.location.reload()">Try again</button>
+      </div>`;
   } finally {
     document.getElementById('loading').style.display = 'none';
   }
-  handleDeepLink();
 }
 
 init();
