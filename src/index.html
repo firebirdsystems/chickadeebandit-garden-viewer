@@ -461,8 +461,15 @@ async function initSchema() {
 
 // ── Load data ──────────────────────────────────────────────────────────────
 
-async function loadGardens() {
-  const { rows } = await dbq('SELECT * FROM app_garden_viewer__gardens ORDER BY name ASC');
+// The garden shown on open is the first by name, so its plants are asked for
+// beside the garden list rather than after it, naming that garden the same way
+// the list orders it. `id` breaks ties so both statements pick the same one.
+const FIRST_GARDEN_PLANTS_SQL = 'SELECT * FROM app_garden_viewer__plants WHERE garden_id = (SELECT id FROM app_garden_viewer__gardens ORDER BY name ASC, id ASC LIMIT 1) ORDER BY common_name ASC';
+
+async function loadGardens(withFirstPlants = false) {
+  const firstPlants = withFirstPlants ? dbq(FIRST_GARDEN_PLANTS_SQL) : null;
+  firstPlants?.catch(() => {});
+  const { rows } = await dbq('SELECT * FROM app_garden_viewer__gardens ORDER BY name ASC, id ASC');
   gardens = rows;
   const sel = document.getElementById('gardenSelect');
   sel.innerHTML = '';
@@ -477,17 +484,26 @@ async function loadGardens() {
     sel.appendChild(opt);
   });
   sel.onchange = () => selectGarden(sel.value);
-  selectGarden(rows[0].id);
+  selectGarden(rows[0].id, firstPlants);
 }
 
-async function selectGarden(id) {
+async function selectGarden(id, plantsRead = null) {
   activeGardenId = id;
   document.getElementById('gardenSelect').value = id;
   closeDetail();
-  const { rows } = await dbq(
+  // `plantsRead` is the read-ahead for the first garden. It is used only if
+  // it answered with rows and every row is this garden's; otherwise the
+  // plants are read by id as before. An empty answer names no garden, so it
+  // cannot be checked and is not used.
+  let rows = null;
+  if (plantsRead) {
+    const ahead = await plantsRead.catch(() => null);
+    if (ahead && ahead.rows.length && ahead.rows.every(p => p.garden_id === id)) rows = ahead.rows;
+  }
+  rows ??= (await dbq(
     'SELECT * FROM app_garden_viewer__plants WHERE garden_id = ? AND (1=1) ORDER BY common_name ASC',
     [id]
-  );
+  )).rows;
   plants = rows.map(p => ({ ...p, photo_file_ids: JSON.parse(p.photo_file_ids || '[]') }));
   renderList();
   if (currentView === 'map' || currentView === 'floorplan') renderMap();
@@ -1216,7 +1232,7 @@ function handleDeepLink() {
 async function init() {
   try {
     await initSchema();
-    await loadGardens();
+    await loadGardens(true);
     if (IS_ADULT) document.getElementById('newGardenBtn').style.display = '';
     if (IS_ADULT) document.getElementById('addPlantBtn').style.display = '';
   } catch (e) {

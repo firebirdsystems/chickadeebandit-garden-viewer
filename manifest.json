@@ -12,7 +12,10 @@
   "storage": "db",
   "preload": {
     "gardens": {
-      "sql": "SELECT * FROM app_garden_viewer__gardens ORDER BY name ASC"
+      "sql": "SELECT * FROM app_garden_viewer__gardens ORDER BY name ASC, id ASC"
+    },
+    "first_garden_plants": {
+      "sql": "SELECT * FROM app_garden_viewer__plants WHERE garden_id = (SELECT id FROM app_garden_viewer__gardens ORDER BY name ASC, id ASC LIMIT 1) ORDER BY common_name ASC"
     }
   },
   "db_encryption": "off",

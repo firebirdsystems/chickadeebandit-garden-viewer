@@ -1,0 +1,2872 @@
+{
+ "seed": [
+  {
+   "sql": "INSERT INTO app_garden_viewer__gardens (id, name, garden_type, created_at, updated_at, version) VALUES (?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-400 days'), strftime('%Y-%m-%dT12:00:00Z','now','-3 days'), ?)",
+   "params": [
+    "perf-garden-1",
+    "Back Yard",
+    "image",
+    4
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__gardens (id, name, garden_type, created_at, updated_at, version) VALUES (?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-300 days'), strftime('%Y-%m-%dT12:00:00Z','now','-3 days'), ?)",
+   "params": [
+    "perf-garden-2",
+    "Front Beds",
+    "map",
+    4
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__gardens (id, name, garden_type, created_at, updated_at, version) VALUES (?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-180 days'), strftime('%Y-%m-%dT12:00:00Z','now','-3 days'), ?)",
+   "params": [
+    "perf-garden-3",
+    "Greenhouse",
+    "image",
+    4
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-20 days'), strftime('%Y-%m-%dT12:00:00Z','now','+0 days'), ?)",
+   "params": [
+    "perf-plant-01",
+    "perf-garden-1",
+    "Tomato 'Sungold'",
+    "Solanum lycopersicum",
+    "vegetable",
+    "Raised bed 1",
+    "Needs staking by June",
+    "[]",
+    "[]",
+    0.08,
+    0.06,
+    "Perf Admin",
+    "{{me}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-37 days'), strftime('%Y-%m-%dT12:00:00Z','now','-1 days'), ?)",
+   "params": [
+    "perf-plant-02",
+    "perf-garden-1",
+    "Tomato 'San Marzano'",
+    "Solanum lycopersicum",
+    "vegetable",
+    "Raised bed 1",
+    "Slugs love this one, check after rain",
+    "[]",
+    "[]",
+    0.45,
+    0.5900000000000001,
+    "Perf Partner",
+    "{{partner}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-54 days'), strftime('%Y-%m-%dT12:00:00Z','now','-2 days'), ?)",
+   "params": [
+    "perf-plant-03",
+    "perf-garden-1",
+    "Basil",
+    "Ocimum basilicum",
+    "herb",
+    "Raised bed 1",
+    "From Grandma's garden",
+    "[]",
+    "[]",
+    0.82,
+    0.24,
+    "Perf Admin",
+    "{{me}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-71 days'), strftime('%Y-%m-%dT12:00:00Z','now','-3 days'), ?)",
+   "params": [
+    "perf-plant-04",
+    "perf-garden-1",
+    "Sweet pepper",
+    "Capsicum annuum",
+    "vegetable",
+    "Raised bed 1",
+    "Divide next spring",
+    "[]",
+    "[]",
+    0.34,
+    0.77,
+    "Perf Neighbour",
+    "{{adult2}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-88 days'), strftime('%Y-%m-%dT12:00:00Z','now','-4 days'), ?)",
+   "params": [
+    "perf-plant-05",
+    "perf-garden-1",
+    "Jalapeño",
+    "Capsicum annuum",
+    "vegetable",
+    "Raised bed 1",
+    "Prune hard in late winter",
+    "[]",
+    "[]",
+    0.71,
+    0.42,
+    "Perf Admin",
+    "{{me}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-105 days'), strftime('%Y-%m-%dT12:00:00Z','now','-5 days'), ?)",
+   "params": [
+    "perf-plant-06",
+    "perf-garden-1",
+    "Zucchini",
+    "Cucurbita pepo",
+    "vegetable",
+    "Raised bed 2",
+    "[]",
+    "[]",
+    0.22999999999999998,
+    0.06999999999999999,
+    "Perf Kid",
+    "{{child}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-122 days'), strftime('%Y-%m-%dT12:00:00Z','now','-6 days'), ?)",
+   "params": [
+    "perf-plant-07",
+    "perf-garden-1",
+    "Cucumber",
+    "Cucumis sativus",
+    "vegetable",
+    "Raised bed 2",
+    "[]",
+    "[]",
+    "Perf Admin",
+    "{{me}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-139 days'), strftime('%Y-%m-%dT12:00:00Z','now','-7 days'), ?)",
+   "params": [
+    "perf-plant-08",
+    "perf-garden-1",
+    "Pole beans",
+    "Phaseolus vulgaris",
+    "vegetable",
+    "Raised bed 2",
+    "[]",
+    "[]",
+    0.12,
+    0.25,
+    "Perf Partner",
+    "{{partner}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-156 days'), strftime('%Y-%m-%dT12:00:00Z','now','-8 days'), ?)",
+   "params": [
+    "perf-plant-09",
+    "perf-garden-1",
+    "Snap peas",
+    "Pisum sativum",
+    "vegetable",
+    "Raised bed 2",
+    "Needs staking by June",
+    "[]",
+    "[]",
+    0.49,
+    0.78,
+    "Perf Admin",
+    "{{me}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-173 days'), strftime('%Y-%m-%dT12:00:00Z','now','-9 days'), ?)",
+   "params": [
+    "perf-plant-10",
+    "perf-garden-1",
+    "Kale 'Lacinato'",
+    "Brassica oleracea",
+    "vegetable",
+    "Raised bed 3",
+    "Slugs love this one, check after rain",
+    "[]",
+    "[]",
+    0.86,
+    0.43,
+    "Perf Neighbour",
+    "{{adult2}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-190 days'), strftime('%Y-%m-%dT12:00:00Z','now','-10 days'), ?)",
+   "params": [
+    "perf-plant-11",
+    "perf-garden-1",
+    "Rainbow chard",
+    "Beta vulgaris",
+    "vegetable",
+    "Raised bed 3",
+    "From Grandma's garden",
+    "[]",
+    "[]",
+    0.38,
+    0.08,
+    "Perf Admin",
+    "{{me}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-207 days'), strftime('%Y-%m-%dT12:00:00Z','now','-11 days'), ?)",
+   "params": [
+    "perf-plant-12",
+    "perf-garden-1",
+    "Butterhead lettuce",
+    "Lactuca sativa",
+    "vegetable",
+    "Raised bed 3",
+    "Divide next spring",
+    "[]",
+    "[]",
+    0.75,
+    0.6100000000000001,
+    "Perf Kid",
+    "{{child}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-224 days'), strftime('%Y-%m-%dT12:00:00Z','now','-12 days'), ?)",
+   "params": [
+    "perf-plant-13",
+    "perf-garden-1",
+    "Arugula",
+    "Eruca vesicaria",
+    "vegetable",
+    "Raised bed 3",
+    "Prune hard in late winter",
+    "[]",
+    "[]",
+    0.27,
+    0.26,
+    "Perf Admin",
+    "{{me}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-241 days'), strftime('%Y-%m-%dT12:00:00Z','now','-13 days'), ?)",
+   "params": [
+    "perf-plant-14",
+    "perf-garden-1",
+    "Carrots",
+    "Daucus carota",
+    "vegetable",
+    "Raised bed 3",
+    "[]",
+    "[]",
+    "Perf Partner",
+    "{{partner}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-258 days'), strftime('%Y-%m-%dT12:00:00Z','now','-14 days'), ?)",
+   "params": [
+    "perf-plant-15",
+    "perf-garden-1",
+    "Radishes",
+    "Raphanus sativus",
+    "vegetable",
+    "Raised bed 3",
+    "[]",
+    "[]",
+    0.16,
+    0.44,
+    "Perf Admin",
+    "{{me}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-275 days'), strftime('%Y-%m-%dT12:00:00Z','now','+0 days'), ?)",
+   "params": [
+    "perf-plant-16",
+    "perf-garden-1",
+    "Garlic",
+    "Allium sativum",
+    "vegetable",
+    "Raised bed 4",
+    "[]",
+    "[]",
+    0.53,
+    0.09,
+    "Perf Neighbour",
+    "{{adult2}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-292 days'), strftime('%Y-%m-%dT12:00:00Z','now','-1 days'), ?)",
+   "params": [
+    "perf-plant-17",
+    "perf-garden-1",
+    "Red onions",
+    "Allium cepa",
+    "vegetable",
+    "Raised bed 4",
+    "Needs staking by June",
+    "[]",
+    "[]",
+    0.8999999999999999,
+    0.6200000000000001,
+    "Perf Admin",
+    "{{me}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-309 days'), strftime('%Y-%m-%dT12:00:00Z','now','-2 days'), ?)",
+   "params": [
+    "perf-plant-18",
+    "perf-garden-1",
+    "Chives",
+    "Allium schoenoprasum",
+    "herb",
+    "Herb spiral",
+    "Slugs love this one, check after rain",
+    "[]",
+    "[]",
+    0.42000000000000004,
+    0.27,
+    "Perf Kid",
+    "{{child}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-326 days'), strftime('%Y-%m-%dT12:00:00Z','now','-3 days'), ?)",
+   "params": [
+    "perf-plant-19",
+    "perf-garden-1",
+    "Rosemary",
+    "Salvia rosmarinus",
+    "herb",
+    "Herb spiral",
+    "From Grandma's garden",
+    "[]",
+    "[]",
+    0.7899999999999999,
+    0.8,
+    "Perf Admin",
+    "{{me}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-343 days'), strftime('%Y-%m-%dT12:00:00Z','now','-4 days'), ?)",
+   "params": [
+    "perf-plant-20",
+    "perf-garden-1",
+    "Thyme",
+    "Thymus vulgaris",
+    "herb",
+    "Herb spiral",
+    "Divide next spring",
+    "[]",
+    "[]",
+    0.31,
+    0.45,
+    "Perf Partner",
+    "{{partner}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-30 days'), strftime('%Y-%m-%dT12:00:00Z','now','-5 days'), ?)",
+   "params": [
+    "perf-plant-21",
+    "perf-garden-1",
+    "Sage",
+    "Salvia officinalis",
+    "herb",
+    "Herb spiral",
+    "Prune hard in late winter",
+    "[]",
+    "[]",
+    "Perf Admin",
+    "{{me}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-47 days'), strftime('%Y-%m-%dT12:00:00Z','now','-6 days'), ?)",
+   "params": [
+    "perf-plant-22",
+    "perf-garden-1",
+    "Oregano",
+    "Origanum vulgare",
+    "herb",
+    "Herb spiral",
+    "[]",
+    "[]",
+    0.2,
+    0.6299999999999999,
+    "Perf Neighbour",
+    "{{adult2}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-64 days'), strftime('%Y-%m-%dT12:00:00Z','now','-7 days'), ?)",
+   "params": [
+    "perf-plant-23",
+    "perf-garden-1",
+    "Mint (in a pot!)",
+    "Mentha spicata",
+    "herb",
+    "Patio pots",
+    "[]",
+    "[]",
+    0.57,
+    0.28,
+    "Perf Admin",
+    "{{me}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-81 days'), strftime('%Y-%m-%dT12:00:00Z','now','-8 days'), ?)",
+   "params": [
+    "perf-plant-24",
+    "perf-garden-1",
+    "Parsley",
+    "Petroselinum crispum",
+    "herb",
+    "Herb spiral",
+    "[]",
+    "[]",
+    0.09,
+    0.81,
+    "Perf Kid",
+    "{{child}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-98 days'), strftime('%Y-%m-%dT12:00:00Z','now','-9 days'), ?)",
+   "params": [
+    "perf-plant-25",
+    "perf-garden-1",
+    "Lavender",
+    "Lavandula angustifolia",
+    "perennial",
+    "South border",
+    "Needs staking by June",
+    "[]",
+    "[]",
+    0.46,
+    0.46,
+    "Perf Admin",
+    "{{me}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-115 days'), strftime('%Y-%m-%dT12:00:00Z','now','-10 days'), ?)",
+   "params": [
+    "perf-plant-26",
+    "perf-garden-1",
+    "Coneflower",
+    "Echinacea purpurea",
+    "perennial",
+    "South border",
+    "Slugs love this one, check after rain",
+    "[]",
+    "[]",
+    0.83,
+    0.11,
+    "Perf Partner",
+    "{{partner}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-132 days'), strftime('%Y-%m-%dT12:00:00Z','now','-11 days'), ?)",
+   "params": [
+    "perf-plant-27",
+    "perf-garden-1",
+    "Black-eyed Susan",
+    "Rudbeckia hirta",
+    "perennial",
+    "South border",
+    "From Grandma's garden",
+    "[]",
+    "[]",
+    0.35000000000000003,
+    0.6399999999999999,
+    "Perf Admin",
+    "{{me}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-149 days'), strftime('%Y-%m-%dT12:00:00Z','now','-12 days'), ?)",
+   "params": [
+    "perf-plant-28",
+    "perf-garden-1",
+    "Bee balm",
+    "Monarda didyma",
+    "perennial",
+    "South border",
+    "Divide next spring",
+    "[]",
+    "[]",
+    "Perf Neighbour",
+    "{{adult2}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-166 days'), strftime('%Y-%m-%dT12:00:00Z','now','-13 days'), ?)",
+   "params": [
+    "perf-plant-29",
+    "perf-garden-1",
+    "Yarrow",
+    "Achillea millefolium",
+    "perennial",
+    "South border",
+    "Prune hard in late winter",
+    "[]",
+    "[]",
+    0.24,
+    0.8200000000000001,
+    "Perf Admin",
+    "{{me}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-183 days'), strftime('%Y-%m-%dT12:00:00Z','now','-14 days'), ?)",
+   "params": [
+    "perf-plant-30",
+    "perf-garden-1",
+    "Peony",
+    "Paeonia lactiflora",
+    "perennial",
+    "South border",
+    "[]",
+    "[]",
+    0.61,
+    0.47,
+    "Perf Kid",
+    "{{child}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-200 days'), strftime('%Y-%m-%dT12:00:00Z','now','+0 days'), ?)",
+   "params": [
+    "perf-plant-31",
+    "perf-garden-1",
+    "Hosta 'Sum and Substance'",
+    "Hosta",
+    "perennial",
+    "Shade corner",
+    "[]",
+    "[]",
+    0.13,
+    0.12,
+    "Perf Admin",
+    "{{me}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-217 days'), strftime('%Y-%m-%dT12:00:00Z','now','-1 days'), ?)",
+   "params": [
+    "perf-plant-32",
+    "perf-garden-1",
+    "Japanese painted fern",
+    "Athyrium niponicum",
+    "perennial",
+    "Shade corner",
+    "[]",
+    "[]",
+    0.5,
+    0.6499999999999999,
+    "Perf Partner",
+    "{{partner}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-234 days'), strftime('%Y-%m-%dT12:00:00Z','now','-2 days'), ?)",
+   "params": [
+    "perf-plant-33",
+    "perf-garden-1",
+    "Astilbe",
+    "Astilbe chinensis",
+    "perennial",
+    "Shade corner",
+    "Needs staking by June",
+    "[]",
+    "[]",
+    0.87,
+    0.3,
+    "Perf Admin",
+    "{{me}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-251 days'), strftime('%Y-%m-%dT12:00:00Z','now','-3 days'), ?)",
+   "params": [
+    "perf-plant-34",
+    "perf-garden-1",
+    "Bleeding heart",
+    "Lamprocapnos spectabilis",
+    "perennial",
+    "Shade corner",
+    "Slugs love this one, check after rain",
+    "[]",
+    "[]",
+    0.39,
+    0.8300000000000001,
+    "Perf Neighbour",
+    "{{adult2}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-268 days'), strftime('%Y-%m-%dT12:00:00Z','now','-4 days'), ?)",
+   "params": [
+    "perf-plant-35",
+    "perf-garden-1",
+    "Hydrangea 'Limelight'",
+    "Hydrangea paniculata",
+    "shrub",
+    "Fence line",
+    "From Grandma's garden",
+    "[]",
+    "[]",
+    "Perf Admin",
+    "{{me}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-285 days'), strftime('%Y-%m-%dT12:00:00Z','now','-5 days'), ?)",
+   "params": [
+    "perf-plant-36",
+    "perf-garden-1",
+    "Lilac",
+    "Syringa vulgaris",
+    "shrub",
+    "Fence line",
+    "Divide next spring",
+    "[]",
+    "[]",
+    0.28,
+    0.13,
+    "Perf Kid",
+    "{{child}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-302 days'), strftime('%Y-%m-%dT12:00:00Z','now','-6 days'), ?)",
+   "params": [
+    "perf-plant-37",
+    "perf-garden-1",
+    "Blueberry 'Bluecrop'",
+    "Vaccinium corymbosum",
+    "shrub",
+    "Fence line",
+    "Prune hard in late winter",
+    "[]",
+    "[]",
+    0.6499999999999999,
+    0.6599999999999999,
+    "Perf Admin",
+    "{{me}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-319 days'), strftime('%Y-%m-%dT12:00:00Z','now','-7 days'), ?)",
+   "params": [
+    "perf-plant-38",
+    "perf-garden-1",
+    "Raspberry canes",
+    "Rubus idaeus",
+    "shrub",
+    "Fence line",
+    "[]",
+    "[]",
+    0.16999999999999998,
+    0.31,
+    "Perf Partner",
+    "{{partner}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-336 days'), strftime('%Y-%m-%dT12:00:00Z','now','-8 days'), ?)",
+   "params": [
+    "perf-plant-39",
+    "perf-garden-1",
+    "Apple 'Honeycrisp'",
+    "Malus domestica",
+    "tree",
+    "Orchard corner",
+    "[]",
+    "[]",
+    0.54,
+    0.8400000000000001,
+    "Perf Admin",
+    "{{me}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-23 days'), strftime('%Y-%m-%dT12:00:00Z','now','-9 days'), ?)",
+   "params": [
+    "perf-plant-40",
+    "perf-garden-1",
+    "Pear 'Bartlett'",
+    "Pyrus communis",
+    "tree",
+    "Orchard corner",
+    "[]",
+    "[]",
+    0.9099999999999999,
+    0.49,
+    "Perf Neighbour",
+    "{{adult2}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-40 days'), strftime('%Y-%m-%dT12:00:00Z','now','-10 days'), ?)",
+   "params": [
+    "perf-plant-41",
+    "perf-garden-1",
+    "Sour cherry",
+    "Prunus cerasus",
+    "tree",
+    "Orchard corner",
+    "Needs staking by June",
+    "[]",
+    "[]",
+    0.43,
+    0.14,
+    "Perf Admin",
+    "{{me}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-57 days'), strftime('%Y-%m-%dT12:00:00Z','now','-11 days'), ?)",
+   "params": [
+    "perf-plant-42",
+    "perf-garden-1",
+    "Japanese maple",
+    "Acer palmatum",
+    "tree",
+    "Patio",
+    "Slugs love this one, check after rain",
+    "[]",
+    "[]",
+    "Perf Kid",
+    "{{child}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-74 days'), strftime('%Y-%m-%dT12:00:00Z','now','-12 days'), ?)",
+   "params": [
+    "perf-plant-43",
+    "perf-garden-1",
+    "Strawberries",
+    "Fragaria × ananassa",
+    "fruit",
+    "Strawberry tower",
+    "From Grandma's garden",
+    "[]",
+    "[]",
+    0.32,
+    0.32,
+    "Perf Admin",
+    "{{me}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-91 days'), strftime('%Y-%m-%dT12:00:00Z','now','-13 days'), ?)",
+   "params": [
+    "perf-plant-44",
+    "perf-garden-1",
+    "Rhubarb",
+    "Rheum rhabarbarum",
+    "vegetable",
+    "Raised bed 4",
+    "Divide next spring",
+    "[]",
+    "[]",
+    0.69,
+    0.8500000000000001,
+    "Perf Partner",
+    "{{partner}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-108 days'), strftime('%Y-%m-%dT12:00:00Z','now','-14 days'), ?)",
+   "params": [
+    "perf-plant-45",
+    "perf-garden-1",
+    "Sunflowers",
+    "Helianthus annuus",
+    "annual",
+    "Back fence",
+    "Prune hard in late winter",
+    "[]",
+    "[]",
+    0.21000000000000002,
+    0.5,
+    "Perf Admin",
+    "{{me}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-125 days'), strftime('%Y-%m-%dT12:00:00Z','now','+0 days'), ?)",
+   "params": [
+    "perf-plant-46",
+    "perf-garden-1",
+    "Zinnias",
+    "Zinnia elegans",
+    "annual",
+    "Cutting patch",
+    "[]",
+    "[]",
+    0.58,
+    0.15,
+    "Perf Neighbour",
+    "{{adult2}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-142 days'), strftime('%Y-%m-%dT12:00:00Z','now','-1 days'), ?)",
+   "params": [
+    "perf-plant-47",
+    "perf-garden-1",
+    "Cosmos",
+    "Cosmos bipinnatus",
+    "annual",
+    "Cutting patch",
+    "[]",
+    "[]",
+    0.1,
+    0.6799999999999999,
+    "Perf Admin",
+    "{{me}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-159 days'), strftime('%Y-%m-%dT12:00:00Z','now','-2 days'), ?)",
+   "params": [
+    "perf-plant-48",
+    "perf-garden-1",
+    "Dahlias",
+    "Dahlia pinnata",
+    "annual",
+    "Cutting patch",
+    "[]",
+    "[]",
+    0.47000000000000003,
+    0.33,
+    "Perf Kid",
+    "{{child}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-176 days'), strftime('%Y-%m-%dT12:00:00Z','now','-3 days'), ?)",
+   "params": [
+    "perf-plant-49",
+    "perf-garden-1",
+    "Nasturtium",
+    "Tropaeolum majus",
+    "annual",
+    "Raised bed 2",
+    "Needs staking by June",
+    "[]",
+    "[]",
+    "Perf Admin",
+    "{{me}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-193 days'), strftime('%Y-%m-%dT12:00:00Z','now','-4 days'), ?)",
+   "params": [
+    "perf-plant-50",
+    "perf-garden-1",
+    "Marigolds",
+    "Tagetes patula",
+    "annual",
+    "Raised bed 1",
+    "Slugs love this one, check after rain",
+    "[]",
+    "[]",
+    0.36000000000000004,
+    0.51,
+    "Perf Partner",
+    "{{partner}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-210 days'), strftime('%Y-%m-%dT12:00:00Z','now','-5 days'), ?)",
+   "params": [
+    "perf-plant-51",
+    "perf-garden-1",
+    "Sweet peas",
+    "Lathyrus odoratus",
+    "annual",
+    "Trellis",
+    "From Grandma's garden",
+    "[]",
+    "[]",
+    0.73,
+    0.16,
+    "Perf Admin",
+    "{{me}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-227 days'), strftime('%Y-%m-%dT12:00:00Z','now','-6 days'), ?)",
+   "params": [
+    "perf-plant-52",
+    "perf-garden-1",
+    "Clematis 'Jackmanii'",
+    "Clematis",
+    "vine",
+    "Trellis",
+    "Divide next spring",
+    "[]",
+    "[]",
+    0.25,
+    0.69,
+    "Perf Neighbour",
+    "{{adult2}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-244 days'), strftime('%Y-%m-%dT12:00:00Z','now','-7 days'), ?)",
+   "params": [
+    "perf-plant-53",
+    "perf-garden-1",
+    "Grape 'Concord'",
+    "Vitis labrusca",
+    "vine",
+    "Pergola",
+    "Prune hard in late winter",
+    "[]",
+    "[]",
+    0.62,
+    0.34,
+    "Perf Admin",
+    "{{me}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-261 days'), strftime('%Y-%m-%dT12:00:00Z','now','-8 days'), ?)",
+   "params": [
+    "perf-plant-54",
+    "perf-garden-1",
+    "Pumpkin",
+    "Cucurbita maxima",
+    "vegetable",
+    "Back fence",
+    "[]",
+    "[]",
+    0.14,
+    0.8700000000000001,
+    "Perf Kid",
+    "{{child}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-278 days'), strftime('%Y-%m-%dT12:00:00Z','now','-9 days'), ?)",
+   "params": [
+    "perf-plant-55",
+    "perf-garden-1",
+    "Asparagus",
+    "Asparagus officinalis",
+    "vegetable",
+    "Raised bed 4",
+    "[]",
+    "[]",
+    0.51,
+    0.52,
+    "Perf Admin",
+    "{{me}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-295 days'), strftime('%Y-%m-%dT12:00:00Z','now','-10 days'), ?)",
+   "params": [
+    "perf-plant-56",
+    "perf-garden-2",
+    "Boxwood hedge",
+    "Buxus sempervirens",
+    "shrub",
+    "Front walk",
+    "[]",
+    "[]",
+    "Perf Partner",
+    "{{partner}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-312 days'), strftime('%Y-%m-%dT12:00:00Z','now','-11 days'), ?)",
+   "params": [
+    "perf-plant-57",
+    "perf-garden-2",
+    "Daylilies",
+    "Hemerocallis",
+    "perennial",
+    "Front walk",
+    "Needs staking by June",
+    "[]",
+    "[]",
+    44.97798,
+    -93.26477333333334,
+    "Perf Admin",
+    "{{me}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-329 days'), strftime('%Y-%m-%dT12:00:00Z','now','-12 days'), ?)",
+   "params": [
+    "perf-plant-58",
+    "perf-garden-2",
+    "Tulips, mixed",
+    "Tulipa",
+    "bulb",
+    "Mailbox bed",
+    "Slugs love this one, check after rain",
+    "[]",
+    "[]",
+    44.9778225,
+    -93.26493,
+    "Perf Neighbour",
+    "{{adult2}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-346 days'), strftime('%Y-%m-%dT12:00:00Z','now','-13 days'), ?)",
+   "params": [
+    "perf-plant-59",
+    "perf-garden-2",
+    "Daffodils",
+    "Narcissus",
+    "bulb",
+    "Mailbox bed",
+    "From Grandma's garden",
+    "[]",
+    "[]",
+    44.977915,
+    -93.26475333333333,
+    "Perf Admin",
+    "{{me}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-33 days'), strftime('%Y-%m-%dT12:00:00Z','now','-14 days'), ?)",
+   "params": [
+    "perf-plant-60",
+    "perf-garden-2",
+    "Crocus",
+    "Crocus vernus",
+    "bulb",
+    "Mailbox bed",
+    "Divide next spring",
+    "[]",
+    "[]",
+    44.978007500000004,
+    -93.26491,
+    "Perf Kid",
+    "{{child}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-50 days'), strftime('%Y-%m-%dT12:00:00Z','now','+0 days'), ?)",
+   "params": [
+    "perf-plant-61",
+    "perf-garden-2",
+    "Allium 'Globemaster'",
+    "Allium",
+    "bulb",
+    "Mailbox bed",
+    "Prune hard in late winter",
+    "[]",
+    "[]",
+    44.977850000000004,
+    -93.26473333333334,
+    "Perf Admin",
+    "{{me}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-67 days'), strftime('%Y-%m-%dT12:00:00Z','now','-1 days'), ?)",
+   "params": [
+    "perf-plant-62",
+    "perf-garden-2",
+    "Catmint",
+    "Nepeta racemosa",
+    "perennial",
+    "Front walk",
+    "[]",
+    "[]",
+    44.977942500000005,
+    -93.26489,
+    "Perf Partner",
+    "{{partner}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-84 days'), strftime('%Y-%m-%dT12:00:00Z','now','-2 days'), ?)",
+   "params": [
+    "perf-plant-63",
+    "perf-garden-2",
+    "Sedum 'Autumn Joy'",
+    "Hylotelephium telephium",
+    "perennial",
+    "Front walk",
+    "[]",
+    "[]",
+    "Perf Admin",
+    "{{me}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-101 days'), strftime('%Y-%m-%dT12:00:00Z','now','-3 days'), ?)",
+   "params": [
+    "perf-plant-64",
+    "perf-garden-2",
+    "Russian sage",
+    "Salvia yangii",
+    "perennial",
+    "Driveway strip",
+    "[]",
+    "[]",
+    44.977877500000005,
+    -93.26487,
+    "Perf Neighbour",
+    "{{adult2}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-118 days'), strftime('%Y-%m-%dT12:00:00Z','now','-4 days'), ?)",
+   "params": [
+    "perf-plant-65",
+    "perf-garden-2",
+    "Feather reed grass",
+    "Calamagrostis acutiflora",
+    "grass",
+    "Driveway strip",
+    "Needs staking by June",
+    "[]",
+    "[]",
+    44.97797,
+    -93.26469333333334,
+    "Perf Admin",
+    "{{me}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-135 days'), strftime('%Y-%m-%dT12:00:00Z','now','-5 days'), ?)",
+   "params": [
+    "perf-plant-66",
+    "perf-garden-2",
+    "Blue fescue",
+    "Festuca glauca",
+    "grass",
+    "Driveway strip",
+    "Slugs love this one, check after rain",
+    "[]",
+    "[]",
+    44.9778125,
+    -93.26485,
+    "Perf Kid",
+    "{{child}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-152 days'), strftime('%Y-%m-%dT12:00:00Z','now','-6 days'), ?)",
+   "params": [
+    "perf-plant-67",
+    "perf-garden-2",
+    "Creeping thyme",
+    "Thymus serpyllum",
+    "groundcover",
+    "Stepping stones",
+    "From Grandma's garden",
+    "[]",
+    "[]",
+    44.977905,
+    -93.26467333333333,
+    "Perf Admin",
+    "{{me}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-169 days'), strftime('%Y-%m-%dT12:00:00Z','now','-7 days'), ?)",
+   "params": [
+    "perf-plant-68",
+    "perf-garden-2",
+    "Rose 'Knock Out'",
+    "Rosa",
+    "shrub",
+    "Porch bed",
+    "Divide next spring",
+    "[]",
+    "[]",
+    44.9779975,
+    -93.26483,
+    "Perf Partner",
+    "{{partner}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-186 days'), strftime('%Y-%m-%dT12:00:00Z','now','-8 days'), ?)",
+   "params": [
+    "perf-plant-69",
+    "perf-garden-2",
+    "Climbing rose",
+    "Rosa",
+    "vine",
+    "Porch bed",
+    "Prune hard in late winter",
+    "[]",
+    "[]",
+    44.97784,
+    -93.26498666666667,
+    "Perf Admin",
+    "{{me}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-203 days'), strftime('%Y-%m-%dT12:00:00Z','now','-9 days'), ?)",
+   "params": [
+    "perf-plant-70",
+    "perf-garden-2",
+    "Dogwood",
+    "Cornus florida",
+    "tree",
+    "Front lawn",
+    "[]",
+    "[]",
+    "Perf Neighbour",
+    "{{adult2}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-220 days'), strftime('%Y-%m-%dT12:00:00Z','now','-10 days'), ?)",
+   "params": [
+    "perf-plant-71",
+    "perf-garden-2",
+    "Redbud",
+    "Cercis canadensis",
+    "tree",
+    "Front lawn",
+    "[]",
+    "[]",
+    44.978025,
+    -93.26496666666667,
+    "Perf Admin",
+    "{{me}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-237 days'), strftime('%Y-%m-%dT12:00:00Z','now','-11 days'), ?)",
+   "params": [
+    "perf-plant-72",
+    "perf-garden-2",
+    "Azalea",
+    "Rhododendron",
+    "shrub",
+    "Porch bed",
+    "[]",
+    "[]",
+    44.9778675,
+    -93.26479,
+    "Perf Kid",
+    "{{child}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-254 days'), strftime('%Y-%m-%dT12:00:00Z','now','-12 days'), ?)",
+   "params": [
+    "perf-plant-73",
+    "perf-garden-2",
+    "Coral bells",
+    "Heuchera",
+    "perennial",
+    "Porch bed",
+    "Needs staking by June",
+    "[]",
+    "[]",
+    44.97796,
+    -93.26494666666667,
+    "Perf Admin",
+    "{{me}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-271 days'), strftime('%Y-%m-%dT12:00:00Z','now','-13 days'), ?)",
+   "params": [
+    "perf-plant-74",
+    "perf-garden-2",
+    "Petunias",
+    "Petunia × atkinsiana",
+    "annual",
+    "Window boxes",
+    "Slugs love this one, check after rain",
+    "[]",
+    "[]",
+    44.9778025,
+    -93.26477,
+    "Perf Partner",
+    "{{partner}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-288 days'), strftime('%Y-%m-%dT12:00:00Z','now','-14 days'), ?)",
+   "params": [
+    "perf-plant-75",
+    "perf-garden-2",
+    "Geraniums",
+    "Pelargonium",
+    "annual",
+    "Window boxes",
+    "From Grandma's garden",
+    "[]",
+    "[]",
+    44.977895000000004,
+    -93.26492666666667,
+    "Perf Admin",
+    "{{me}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-305 days'), strftime('%Y-%m-%dT12:00:00Z','now','+0 days'), ?)",
+   "params": [
+    "perf-plant-76",
+    "perf-garden-3",
+    "Tomato seedlings",
+    "Solanum lycopersicum",
+    "vegetable",
+    "Bench A",
+    "Divide next spring",
+    "[]",
+    "[]",
+    0.63,
+    0.21,
+    "Perf Neighbour",
+    "{{adult2}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-322 days'), strftime('%Y-%m-%dT12:00:00Z','now','-1 days'), ?)",
+   "params": [
+    "perf-plant-77",
+    "perf-garden-3",
+    "Pepper seedlings",
+    "Capsicum annuum",
+    "vegetable",
+    "Bench A",
+    "Prune hard in late winter",
+    "[]",
+    "[]",
+    "Perf Admin",
+    "{{me}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-339 days'), strftime('%Y-%m-%dT12:00:00Z','now','-2 days'), ?)",
+   "params": [
+    "perf-plant-78",
+    "perf-garden-3",
+    "Meyer lemon",
+    "Citrus × meyeri",
+    "tree",
+    "Floor pots",
+    "[]",
+    "[]",
+    0.52,
+    0.39,
+    "Perf Kid",
+    "{{child}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-26 days'), strftime('%Y-%m-%dT12:00:00Z','now','-3 days'), ?)",
+   "params": [
+    "perf-plant-79",
+    "perf-garden-3",
+    "Fig 'Brown Turkey'",
+    "Ficus carica",
+    "tree",
+    "Floor pots",
+    "[]",
+    "[]",
+    0.89,
+    0.9199999999999999,
+    "Perf Admin",
+    "{{me}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-43 days'), strftime('%Y-%m-%dT12:00:00Z','now','-4 days'), ?)",
+   "params": [
+    "perf-plant-80",
+    "perf-garden-3",
+    "Orchid",
+    "Phalaenopsis",
+    "houseplant",
+    "Bench B",
+    "[]",
+    "[]",
+    0.41000000000000003,
+    0.5700000000000001,
+    "Perf Partner",
+    "{{partner}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-60 days'), strftime('%Y-%m-%dT12:00:00Z','now','-5 days'), ?)",
+   "params": [
+    "perf-plant-81",
+    "perf-garden-3",
+    "Aloe vera",
+    "Aloe vera",
+    "succulent",
+    "Bench B",
+    "Needs staking by June",
+    "[]",
+    "[]",
+    0.7799999999999999,
+    0.22,
+    "Perf Admin",
+    "{{me}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-77 days'), strftime('%Y-%m-%dT12:00:00Z','now','-6 days'), ?)",
+   "params": [
+    "perf-plant-82",
+    "perf-garden-3",
+    "Jade plant",
+    "Crassula ovata",
+    "succulent",
+    "Bench B",
+    "Slugs love this one, check after rain",
+    "[]",
+    "[]",
+    0.3,
+    0.75,
+    "Perf Neighbour",
+    "{{adult2}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-94 days'), strftime('%Y-%m-%dT12:00:00Z','now','-7 days'), ?)",
+   "params": [
+    "perf-plant-83",
+    "perf-garden-3",
+    "Microgreens tray",
+    "Brassica mix",
+    "vegetable",
+    "Bench A",
+    "From Grandma's garden",
+    "[]",
+    "[]",
+    0.6699999999999999,
+    0.4,
+    "Perf Admin",
+    "{{me}}",
+    2
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-111 days'), strftime('%Y-%m-%dT12:00:00Z','now','-8 days'), ?)",
+   "params": [
+    "perf-plant-84",
+    "perf-garden-3",
+    "Ginger",
+    "Zingiber officinale",
+    "herb",
+    "Floor pots",
+    "Divide next spring",
+    "[]",
+    "[]",
+    "Perf Kid",
+    "{{child}}",
+    3
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plants (id, garden_id, common_name, scientific_name, plant_type, bed_name, notes, photo_urls, photo_file_ids, lat, lng, added_by_name, added_by_id, created_at, updated_at, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT12:00:00Z','now','-128 days'), strftime('%Y-%m-%dT12:00:00Z','now','-9 days'), ?)",
+   "params": [
+    "perf-plant-85",
+    "perf-garden-3",
+    "Lemongrass",
+    "Cymbopogon citratus",
+    "herb",
+    "Floor pots",
+    "Prune hard in late winter",
+    "[]",
+    "[]",
+    0.5599999999999999,
+    0.5800000000000001,
+    "Perf Admin",
+    "{{me}}",
+    1
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:10:00Z','now','+0 days'))",
+   "params": [
+    "perf-pe-01",
+    "perf-plant-01",
+    "perf-garden-1",
+    "watered",
+    "{{date:0}}",
+    "Deep soak",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:11:00Z','now','-1 days'))",
+   "params": [
+    "perf-pe-02",
+    "perf-plant-06",
+    "perf-garden-1",
+    "fertilized",
+    "{{date:-1}}",
+    "Fish emulsion, half strength",
+    "Perf Partner",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:12:00Z','now','-2 days'))",
+   "params": [
+    "perf-pe-03",
+    "perf-plant-11",
+    "perf-garden-1",
+    "pruned",
+    "{{date:-2}}",
+    "Took off the lower suckers",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:13:00Z','now','-4 days'))",
+   "params": [
+    "perf-pe-04",
+    "perf-plant-16",
+    "perf-garden-1",
+    "harvested",
+    "{{date:-4}}",
+    "Two full bowls",
+    "Perf Neighbour",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:14:00Z','now','-5 days'))",
+   "params": [
+    "perf-pe-05",
+    "perf-plant-21",
+    "perf-garden-1",
+    "planted",
+    "{{date:-5}}",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:15:00Z','now','-7 days'))",
+   "params": [
+    "perf-pe-06",
+    "perf-plant-26",
+    "perf-garden-1",
+    "watered",
+    "{{date:-7}}",
+    "Perf Kid",
+    "{{child}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:16:00Z','now','-8 days'))",
+   "params": [
+    "perf-pe-07",
+    "perf-plant-31",
+    "perf-garden-1",
+    "mulched",
+    "{{date:-8}}",
+    "Deep soak",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:17:00Z','now','-9 days'))",
+   "params": [
+    "perf-pe-08",
+    "perf-plant-36",
+    "perf-garden-1",
+    "pest_check",
+    "{{date:-9}}",
+    "Fish emulsion, half strength",
+    "Perf Partner",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:18:00Z','now','-11 days'))",
+   "params": [
+    "perf-pe-09",
+    "perf-plant-64",
+    "perf-garden-2",
+    "watered",
+    "{{date:-11}}",
+    "Took off the lower suckers",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:19:00Z','now','-12 days'))",
+   "params": [
+    "perf-pe-10",
+    "perf-plant-46",
+    "perf-garden-1",
+    "fertilized",
+    "{{date:-12}}",
+    "Two full bowls",
+    "Perf Neighbour",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:20:00Z','now','-14 days'))",
+   "params": [
+    "perf-pe-11",
+    "perf-plant-51",
+    "perf-garden-1",
+    "pruned",
+    "{{date:-14}}",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:21:00Z','now','-15 days'))",
+   "params": [
+    "perf-pe-12",
+    "perf-plant-01",
+    "perf-garden-1",
+    "harvested",
+    "{{date:-15}}",
+    "Perf Kid",
+    "{{child}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:22:00Z','now','-16 days'))",
+   "params": [
+    "perf-pe-13",
+    "perf-plant-06",
+    "perf-garden-1",
+    "planted",
+    "{{date:-16}}",
+    "Deep soak",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:23:00Z','now','-18 days'))",
+   "params": [
+    "perf-pe-14",
+    "perf-plant-11",
+    "perf-garden-1",
+    "watered",
+    "{{date:-18}}",
+    "Fish emulsion, half strength",
+    "Perf Partner",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:24:00Z','now','-19 days'))",
+   "params": [
+    "perf-pe-15",
+    "perf-plant-16",
+    "perf-garden-1",
+    "mulched",
+    "{{date:-19}}",
+    "Took off the lower suckers",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:25:00Z','now','-21 days'))",
+   "params": [
+    "perf-pe-16",
+    "perf-plant-21",
+    "perf-garden-1",
+    "pest_check",
+    "{{date:-21}}",
+    "Two full bowls",
+    "Perf Neighbour",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:26:00Z','now','-22 days'))",
+   "params": [
+    "perf-pe-17",
+    "perf-plant-26",
+    "perf-garden-1",
+    "watered",
+    "{{date:-22}}",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:27:00Z','now','-23 days'))",
+   "params": [
+    "perf-pe-18",
+    "perf-plant-73",
+    "perf-garden-2",
+    "fertilized",
+    "{{date:-23}}",
+    "Perf Kid",
+    "{{child}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:28:00Z','now','-25 days'))",
+   "params": [
+    "perf-pe-19",
+    "perf-plant-36",
+    "perf-garden-1",
+    "pruned",
+    "{{date:-25}}",
+    "Deep soak",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:29:00Z','now','-26 days'))",
+   "params": [
+    "perf-pe-20",
+    "perf-plant-41",
+    "perf-garden-1",
+    "harvested",
+    "{{date:-26}}",
+    "Fish emulsion, half strength",
+    "Perf Partner",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:30:00Z','now','-28 days'))",
+   "params": [
+    "perf-pe-21",
+    "perf-plant-46",
+    "perf-garden-1",
+    "planted",
+    "{{date:-28}}",
+    "Took off the lower suckers",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:31:00Z','now','-29 days'))",
+   "params": [
+    "perf-pe-22",
+    "perf-plant-51",
+    "perf-garden-1",
+    "watered",
+    "{{date:-29}}",
+    "Two full bowls",
+    "Perf Neighbour",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:32:00Z','now','-30 days'))",
+   "params": [
+    "perf-pe-23",
+    "perf-plant-01",
+    "perf-garden-1",
+    "mulched",
+    "{{date:-30}}",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:33:00Z','now','-32 days'))",
+   "params": [
+    "perf-pe-24",
+    "perf-plant-06",
+    "perf-garden-1",
+    "pest_check",
+    "{{date:-32}}",
+    "Perf Kid",
+    "{{child}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:34:00Z','now','-33 days'))",
+   "params": [
+    "perf-pe-25",
+    "perf-plant-11",
+    "perf-garden-1",
+    "watered",
+    "{{date:-33}}",
+    "Deep soak",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:35:00Z','now','-35 days'))",
+   "params": [
+    "perf-pe-26",
+    "perf-plant-16",
+    "perf-garden-1",
+    "fertilized",
+    "{{date:-35}}",
+    "Fish emulsion, half strength",
+    "Perf Partner",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:36:00Z','now','-36 days'))",
+   "params": [
+    "perf-pe-27",
+    "perf-plant-82",
+    "perf-garden-3",
+    "pruned",
+    "{{date:-36}}",
+    "Took off the lower suckers",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:37:00Z','now','-37 days'))",
+   "params": [
+    "perf-pe-28",
+    "perf-plant-26",
+    "perf-garden-1",
+    "harvested",
+    "{{date:-37}}",
+    "Two full bowls",
+    "Perf Neighbour",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:38:00Z','now','-39 days'))",
+   "params": [
+    "perf-pe-29",
+    "perf-plant-31",
+    "perf-garden-1",
+    "planted",
+    "{{date:-39}}",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:39:00Z','now','-40 days'))",
+   "params": [
+    "perf-pe-30",
+    "perf-plant-36",
+    "perf-garden-1",
+    "watered",
+    "{{date:-40}}",
+    "Perf Kid",
+    "{{child}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:40:00Z','now','-42 days'))",
+   "params": [
+    "perf-pe-31",
+    "perf-plant-41",
+    "perf-garden-1",
+    "mulched",
+    "{{date:-42}}",
+    "Deep soak",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:41:00Z','now','-43 days'))",
+   "params": [
+    "perf-pe-32",
+    "perf-plant-46",
+    "perf-garden-1",
+    "pest_check",
+    "{{date:-43}}",
+    "Fish emulsion, half strength",
+    "Perf Partner",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:42:00Z','now','-44 days'))",
+   "params": [
+    "perf-pe-33",
+    "perf-plant-51",
+    "perf-garden-1",
+    "watered",
+    "{{date:-44}}",
+    "Took off the lower suckers",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:43:00Z','now','-46 days'))",
+   "params": [
+    "perf-pe-34",
+    "perf-plant-01",
+    "perf-garden-1",
+    "fertilized",
+    "{{date:-46}}",
+    "Two full bowls",
+    "Perf Neighbour",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:44:00Z','now','-47 days'))",
+   "params": [
+    "perf-pe-35",
+    "perf-plant-06",
+    "perf-garden-1",
+    "pruned",
+    "{{date:-47}}",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:45:00Z','now','-49 days'))",
+   "params": [
+    "perf-pe-36",
+    "perf-plant-61",
+    "perf-garden-2",
+    "harvested",
+    "{{date:-49}}",
+    "Perf Kid",
+    "{{child}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:46:00Z','now','-50 days'))",
+   "params": [
+    "perf-pe-37",
+    "perf-plant-16",
+    "perf-garden-1",
+    "planted",
+    "{{date:-50}}",
+    "Deep soak",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:47:00Z','now','-51 days'))",
+   "params": [
+    "perf-pe-38",
+    "perf-plant-21",
+    "perf-garden-1",
+    "watered",
+    "{{date:-51}}",
+    "Fish emulsion, half strength",
+    "Perf Partner",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:48:00Z','now','-53 days'))",
+   "params": [
+    "perf-pe-39",
+    "perf-plant-26",
+    "perf-garden-1",
+    "mulched",
+    "{{date:-53}}",
+    "Took off the lower suckers",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:49:00Z','now','-54 days'))",
+   "params": [
+    "perf-pe-40",
+    "perf-plant-31",
+    "perf-garden-1",
+    "pest_check",
+    "{{date:-54}}",
+    "Two full bowls",
+    "Perf Neighbour",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:50:00Z','now','-56 days'))",
+   "params": [
+    "perf-pe-41",
+    "perf-plant-36",
+    "perf-garden-1",
+    "watered",
+    "{{date:-56}}",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:51:00Z','now','-57 days'))",
+   "params": [
+    "perf-pe-42",
+    "perf-plant-41",
+    "perf-garden-1",
+    "fertilized",
+    "{{date:-57}}",
+    "Perf Kid",
+    "{{child}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:52:00Z','now','-58 days'))",
+   "params": [
+    "perf-pe-43",
+    "perf-plant-46",
+    "perf-garden-1",
+    "pruned",
+    "{{date:-58}}",
+    "Deep soak",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:53:00Z','now','-60 days'))",
+   "params": [
+    "perf-pe-44",
+    "perf-plant-51",
+    "perf-garden-1",
+    "harvested",
+    "{{date:-60}}",
+    "Fish emulsion, half strength",
+    "Perf Partner",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:54:00Z','now','-61 days'))",
+   "params": [
+    "perf-pe-45",
+    "perf-plant-70",
+    "perf-garden-2",
+    "planted",
+    "{{date:-61}}",
+    "Took off the lower suckers",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:10:00Z','now','-62 days'))",
+   "params": [
+    "perf-pe-46",
+    "perf-plant-06",
+    "perf-garden-1",
+    "watered",
+    "{{date:-62}}",
+    "Two full bowls",
+    "Perf Neighbour",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:11:00Z','now','-64 days'))",
+   "params": [
+    "perf-pe-47",
+    "perf-plant-11",
+    "perf-garden-1",
+    "mulched",
+    "{{date:-64}}",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:12:00Z','now','-65 days'))",
+   "params": [
+    "perf-pe-48",
+    "perf-plant-16",
+    "perf-garden-1",
+    "pest_check",
+    "{{date:-65}}",
+    "Perf Kid",
+    "{{child}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:13:00Z','now','-67 days'))",
+   "params": [
+    "perf-pe-49",
+    "perf-plant-21",
+    "perf-garden-1",
+    "watered",
+    "{{date:-67}}",
+    "Deep soak",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:14:00Z','now','-68 days'))",
+   "params": [
+    "perf-pe-50",
+    "perf-plant-26",
+    "perf-garden-1",
+    "fertilized",
+    "{{date:-68}}",
+    "Fish emulsion, half strength",
+    "Perf Partner",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:15:00Z','now','-70 days'))",
+   "params": [
+    "perf-pe-51",
+    "perf-plant-31",
+    "perf-garden-1",
+    "pruned",
+    "{{date:-70}}",
+    "Took off the lower suckers",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:16:00Z','now','-71 days'))",
+   "params": [
+    "perf-pe-52",
+    "perf-plant-36",
+    "perf-garden-1",
+    "harvested",
+    "{{date:-71}}",
+    "Two full bowls",
+    "Perf Neighbour",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:17:00Z','now','-72 days'))",
+   "params": [
+    "perf-pe-53",
+    "perf-plant-41",
+    "perf-garden-1",
+    "planted",
+    "{{date:-72}}",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:18:00Z','now','-74 days'))",
+   "params": [
+    "perf-pe-54",
+    "perf-plant-79",
+    "perf-garden-3",
+    "watered",
+    "{{date:-74}}",
+    "Perf Kid",
+    "{{child}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:19:00Z','now','-75 days'))",
+   "params": [
+    "perf-pe-55",
+    "perf-plant-51",
+    "perf-garden-1",
+    "mulched",
+    "{{date:-75}}",
+    "Deep soak",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:20:00Z','now','-77 days'))",
+   "params": [
+    "perf-pe-56",
+    "perf-plant-01",
+    "perf-garden-1",
+    "pest_check",
+    "{{date:-77}}",
+    "Fish emulsion, half strength",
+    "Perf Partner",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:21:00Z','now','-78 days'))",
+   "params": [
+    "perf-pe-57",
+    "perf-plant-06",
+    "perf-garden-1",
+    "watered",
+    "{{date:-78}}",
+    "Took off the lower suckers",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:22:00Z','now','-79 days'))",
+   "params": [
+    "perf-pe-58",
+    "perf-plant-11",
+    "perf-garden-1",
+    "fertilized",
+    "{{date:-79}}",
+    "Two full bowls",
+    "Perf Neighbour",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:23:00Z','now','-81 days'))",
+   "params": [
+    "perf-pe-59",
+    "perf-plant-16",
+    "perf-garden-1",
+    "pruned",
+    "{{date:-81}}",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:24:00Z','now','-82 days'))",
+   "params": [
+    "perf-pe-60",
+    "perf-plant-21",
+    "perf-garden-1",
+    "harvested",
+    "{{date:-82}}",
+    "Perf Kid",
+    "{{child}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:25:00Z','now','-84 days'))",
+   "params": [
+    "perf-pe-61",
+    "perf-plant-26",
+    "perf-garden-1",
+    "planted",
+    "{{date:-84}}",
+    "Deep soak",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:26:00Z','now','-85 days'))",
+   "params": [
+    "perf-pe-62",
+    "perf-plant-31",
+    "perf-garden-1",
+    "watered",
+    "{{date:-85}}",
+    "Fish emulsion, half strength",
+    "Perf Partner",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:27:00Z','now','-86 days'))",
+   "params": [
+    "perf-pe-63",
+    "perf-plant-58",
+    "perf-garden-2",
+    "mulched",
+    "{{date:-86}}",
+    "Took off the lower suckers",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:28:00Z','now','-88 days'))",
+   "params": [
+    "perf-pe-64",
+    "perf-plant-41",
+    "perf-garden-1",
+    "pest_check",
+    "{{date:-88}}",
+    "Two full bowls",
+    "Perf Neighbour",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:29:00Z','now','-89 days'))",
+   "params": [
+    "perf-pe-65",
+    "perf-plant-46",
+    "perf-garden-1",
+    "watered",
+    "{{date:-89}}",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:30:00Z','now','-91 days'))",
+   "params": [
+    "perf-pe-66",
+    "perf-plant-51",
+    "perf-garden-1",
+    "fertilized",
+    "{{date:-91}}",
+    "Perf Kid",
+    "{{child}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:31:00Z','now','-92 days'))",
+   "params": [
+    "perf-pe-67",
+    "perf-plant-01",
+    "perf-garden-1",
+    "pruned",
+    "{{date:-92}}",
+    "Deep soak",
+    "Perf Admin",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__plant_events (id, plant_id, garden_id, event_type, event_date, notes, added_by_name, added_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT08:32:00Z','now','-93 days'))",
+   "params": [
+    "perf-pe-68",
+    "perf-plant-06",
+    "perf-garden-1",
+    "harvested",
+    "{{date:-93}}",
+    "Fish emulsion, half strength",
+    "Perf Partner",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:10:00Z','now','+0 days'))",
+   "params": [
+    "perf-ga-01",
+    "perf-garden-1",
+    "Perf Admin",
+    "{{me}}",
+    "added",
+    "Tomato 'Sungold'"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:11:00Z','now','-2 days'))",
+   "params": [
+    "perf-ga-02",
+    "perf-garden-1",
+    "Perf Partner",
+    "{{partner}}",
+    "updated",
+    "Butterhead lettuce"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:12:00Z','now','-4 days'))",
+   "params": [
+    "perf-ga-03",
+    "perf-garden-1",
+    "Perf Admin",
+    "{{me}}",
+    "moved",
+    "Mint (in a pot!)"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:13:00Z','now','-6 days'))",
+   "params": [
+    "perf-ga-04",
+    "perf-garden-1",
+    "Perf Neighbour",
+    "{{adult2}}",
+    "updated",
+    "Bleeding heart"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:14:00Z','now','-8 days'))",
+   "params": [
+    "perf-ga-05",
+    "perf-garden-1",
+    "Perf Admin",
+    "{{me}}",
+    "added",
+    "Sunflowers"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:15:00Z','now','-10 days'))",
+   "params": [
+    "perf-ga-06",
+    "perf-garden-2",
+    "Perf Kid",
+    "{{child}}",
+    "updated",
+    "Boxwood hedge"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:16:00Z','now','-12 days'))",
+   "params": [
+    "perf-ga-07",
+    "perf-garden-2",
+    "Perf Admin",
+    "{{me}}",
+    "moved",
+    "Creeping thyme"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:17:00Z','now','-14 days'))",
+   "params": [
+    "perf-ga-08",
+    "perf-garden-3",
+    "Perf Partner",
+    "{{partner}}",
+    "updated",
+    "Meyer lemon"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:18:00Z','now','-16 days'))",
+   "params": [
+    "perf-ga-09",
+    "perf-garden-1",
+    "Perf Admin",
+    "{{me}}",
+    "added",
+    "Sweet pepper"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:19:00Z','now','-18 days'))",
+   "params": [
+    "perf-ga-10",
+    "perf-garden-1",
+    "Perf Neighbour",
+    "{{adult2}}",
+    "updated",
+    "Radishes"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:20:00Z','now','-20 days'))",
+   "params": [
+    "perf-ga-11",
+    "perf-garden-1",
+    "Perf Admin",
+    "{{me}}",
+    "moved",
+    "Coneflower"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:21:00Z','now','-22 days'))",
+   "params": [
+    "perf-ga-12",
+    "perf-garden-1",
+    "Perf Kid",
+    "{{child}}",
+    "updated",
+    "Blueberry 'Bluecrop'"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:22:00Z','now','-24 days'))",
+   "params": [
+    "perf-ga-13",
+    "perf-garden-1",
+    "Perf Admin",
+    "{{me}}",
+    "added",
+    "Dahlias"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:23:00Z','now','-26 days'))",
+   "params": [
+    "perf-ga-14",
+    "perf-garden-2",
+    "Perf Partner",
+    "{{partner}}",
+    "updated",
+    "Daffodils"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:24:00Z','now','-28 days'))",
+   "params": [
+    "perf-ga-15",
+    "perf-garden-2",
+    "Perf Admin",
+    "{{me}}",
+    "moved",
+    "Dogwood"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:25:00Z','now','-30 days'))",
+   "params": [
+    "perf-ga-16",
+    "perf-garden-3",
+    "Perf Neighbour",
+    "{{adult2}}",
+    "updated",
+    "Aloe vera"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:26:00Z','now','-32 days'))",
+   "params": [
+    "perf-ga-17",
+    "perf-garden-1",
+    "Perf Admin",
+    "{{me}}",
+    "added",
+    "Cucumber"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:27:00Z','now','-34 days'))",
+   "params": [
+    "perf-ga-18",
+    "perf-garden-1",
+    "Perf Kid",
+    "{{child}}",
+    "updated",
+    "Chives"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:28:00Z','now','-36 days'))",
+   "params": [
+    "perf-ga-19",
+    "perf-garden-1",
+    "Perf Admin",
+    "{{me}}",
+    "moved",
+    "Yarrow"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:29:00Z','now','-38 days'))",
+   "params": [
+    "perf-ga-20",
+    "perf-garden-1",
+    "Perf Partner",
+    "{{partner}}",
+    "updated",
+    "Pear 'Bartlett'"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:30:00Z','now','-40 days'))",
+   "params": [
+    "perf-ga-21",
+    "perf-garden-1",
+    "Perf Admin",
+    "{{me}}",
+    "added",
+    "Sweet peas"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:31:00Z','now','-42 days'))",
+   "params": [
+    "perf-ga-22",
+    "perf-garden-2",
+    "Perf Neighbour",
+    "{{adult2}}",
+    "updated",
+    "Catmint"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:32:00Z','now','-44 days'))",
+   "params": [
+    "perf-ga-23",
+    "perf-garden-2",
+    "Perf Admin",
+    "{{me}}",
+    "moved",
+    "Coral bells"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:33:00Z','now','-46 days'))",
+   "params": [
+    "perf-ga-24",
+    "perf-garden-3",
+    "Perf Kid",
+    "{{child}}",
+    "updated",
+    "Ginger"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:34:00Z','now','-48 days'))",
+   "params": [
+    "perf-ga-25",
+    "perf-garden-1",
+    "Perf Admin",
+    "{{me}}",
+    "added",
+    "Kale 'Lacinato'"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:35:00Z','now','-50 days'))",
+   "params": [
+    "perf-ga-26",
+    "perf-garden-1",
+    "Perf Partner",
+    "{{partner}}",
+    "updated",
+    "Sage"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:36:00Z','now','-52 days'))",
+   "params": [
+    "perf-ga-27",
+    "perf-garden-1",
+    "Perf Admin",
+    "{{me}}",
+    "moved",
+    "Japanese painted fern"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:37:00Z','now','-54 days'))",
+   "params": [
+    "perf-ga-28",
+    "perf-garden-1",
+    "Perf Neighbour",
+    "{{adult2}}",
+    "updated",
+    "Strawberries"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:38:00Z','now','-56 days'))",
+   "params": [
+    "perf-ga-29",
+    "perf-garden-1",
+    "Perf Admin",
+    "{{me}}",
+    "added",
+    "Pumpkin"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:39:00Z','now','-58 days'))",
+   "params": [
+    "perf-ga-30",
+    "perf-garden-2",
+    "Perf Kid",
+    "{{child}}",
+    "updated",
+    "Feather reed grass"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:40:00Z','now','-60 days'))",
+   "params": [
+    "perf-ga-31",
+    "perf-garden-3",
+    "Perf Admin",
+    "{{me}}",
+    "moved",
+    "Tomato seedlings"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:41:00Z','now','-62 days'))",
+   "params": [
+    "perf-ga-32",
+    "perf-garden-1",
+    "Perf Partner",
+    "{{partner}}",
+    "updated",
+    "Tomato 'San Marzano'"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:42:00Z','now','-64 days'))",
+   "params": [
+    "perf-ga-33",
+    "perf-garden-1",
+    "Perf Admin",
+    "{{me}}",
+    "added",
+    "Arugula"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:43:00Z','now','-66 days'))",
+   "params": [
+    "perf-ga-34",
+    "perf-garden-1",
+    "Perf Neighbour",
+    "{{adult2}}",
+    "updated",
+    "Parsley"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:44:00Z','now','-68 days'))",
+   "params": [
+    "perf-ga-35",
+    "perf-garden-1",
+    "Perf Admin",
+    "{{me}}",
+    "moved",
+    "Hydrangea 'Limelight'"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:45:00Z','now','-70 days'))",
+   "params": [
+    "perf-ga-36",
+    "perf-garden-1",
+    "Perf Kid",
+    "{{child}}",
+    "updated",
+    "Zinnias"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:46:00Z','now','-72 days'))",
+   "params": [
+    "perf-ga-37",
+    "perf-garden-2",
+    "Perf Admin",
+    "{{me}}",
+    "added",
+    "Daylilies"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_garden_viewer__garden_activity (id, garden_id, actor_name, actor_id, action, subject_name, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT09:47:00Z','now','-74 days'))",
+   "params": [
+    "perf-ga-38",
+    "perf-garden-2",
+    "Perf Partner",
+    "{{partner}}",
+    "updated",
+    "Rose 'Knock Out'"
+   ]
+  }
+ ]
+}
