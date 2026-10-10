@@ -190,6 +190,79 @@
           "selector": "[data-testid=\"new-garden\"]"
         }
       ]
+    },
+    {
+      "name": "an adult adds a plant, which is listed under their name after a reload",
+      "members": {
+        "member": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_garden_viewer__gardens (id, name, garden_type, created_at, updated_at) VALUES (?, ?, 'image', datetime('now'), datetime('now'))",
+          "params": [
+            "ui-garden-add",
+            "Front Yard"
+          ]
+        },
+        {
+          "action": "open",
+          "as": "member"
+        },
+        {
+          "action": "click",
+          "as": "member",
+          "selector": "[data-testid=\"add-plant\"]"
+        },
+        {
+          "action": "fill",
+          "as": "member",
+          "selector": "#plantNameInput",
+          "value": "Sword Fern"
+        },
+        {
+          "action": "click",
+          "as": "member",
+          "selector": "#addPlantSubmitBtn"
+        },
+        {
+          "action": "expectVisible",
+          "as": "member",
+          "selector": "#placementBanner"
+        },
+        {
+          "action": "click",
+          "as": "member",
+          "selector": "#placementBanner .btn-skip"
+        },
+        {
+          "action": "click",
+          "as": "member",
+          "selector": "[data-testid=\"view-list\"]"
+        },
+        {
+          "action": "expectText",
+          "as": "member",
+          "selector": "[data-testid=\"plant-list\"]",
+          "text": "Sword Fern"
+        },
+        {
+          "action": "reload",
+          "as": "member"
+        },
+        {
+          "action": "expectCount",
+          "as": "member",
+          "selector": "[data-testid=\"plant-item\"]",
+          "count": 1
+        },
+        {
+          "action": "expectText",
+          "as": "member",
+          "selector": "[data-testid=\"plant-item\"] .plant-meta",
+          "text": "by "
+        }
+      ]
     }
   ]
 }
