@@ -506,13 +506,17 @@ async function recordChange(entityType, entityId, operation = 'upsert') {
 }
 
 /** Runs a member's action and tells them if it fails, instead of leaving the
- *  failure as an unhandled rejection nobody sees. */
+ *  failure as an unhandled rejection nobody sees. Only this page's own wording
+ *  (`forUser`) and a refused upload (`uploadRefusal`: too large, wrong type,
+ *  storage full) are shown; any other error is logged and gets the fixed line. */
 function reporting(what, fn) {
   return async (...args) => {
     try {
       return await fn(...args);
     } catch (e) {
-      await hubAlert(`${what}: ${e?.message ?? 'something went wrong.'}`);
+      if ((e?.forUser || e?.uploadRefusal) && e.message) { await hubAlert(`${what}: ${e.message}`); return; }
+      console.error(e);
+      await hubAlert(`${what} — try again.`);
     }
   };
 }
@@ -556,7 +560,7 @@ async function loadGardens(withFirstPlants = false, selectId = null) {
     opt.textContent = g.name;
     sel.appendChild(opt);
   });
-  sel.onchange = reporting('Could not open that garden', () => selectGarden(sel.value));
+  sel.onchange = reporting('Couldn’t open that garden', () => selectGarden(sel.value));
   // Awaited, so a caller that goes on to use `plants` (the deep link) sees them.
   const target = selectId && rows.some(g => g.id === selectId) ? selectId : rows[0].id;
   await selectGarden(target, target === rows[0].id ? firstPlants : null);
@@ -938,6 +942,10 @@ async function uploadWithProgress(file, label, options = {}) {
       },
     });
     return result; // { id, url, thumbnailId? }
+  } catch (e) {
+    // The hub's reason for turning an upload away is one the member can act on.
+    if (e && typeof e === 'object') e.uploadRefusal = true;
+    throw e;
   } finally {
     bar.style.display = 'none';
   }
@@ -1086,7 +1094,7 @@ document.getElementById('photo-input').addEventListener('change', async (e) => {
   e.target.value = '';
   const plant = _uploadTargetPlant;
   _uploadTargetPlant = null;
-  if (file && plant) await reporting('Could not add the photo', addPhotoToPlant)(plant, file);
+  if (file && plant) await reporting('Couldn’t add the photo', addPhotoToPlant)(plant, file);
 });
 
 document.getElementById('plan-input').addEventListener('change', async (e) => {
@@ -1094,7 +1102,7 @@ document.getElementById('plan-input').addEventListener('change', async (e) => {
   e.target.value = '';
   const garden = _uploadTargetGarden;
   _uploadTargetGarden = null;
-  if (file && garden) await reporting('Could not upload the floor plan', uploadFloorPlan)(garden, file);
+  if (file && garden) await reporting('Couldn’t upload the floor plan', uploadFloorPlan)(garden, file);
 });
 
 window.triggerPhotoUpload = (plantId) => {
@@ -1109,7 +1117,7 @@ window.triggerPlanUpload = (gardenId) => {
 
 window.removePhoto = (plantId, fileId) => {
   const plant = plants.find(p => p.id === plantId);
-  if (plant) reporting('Could not remove the photo', removePhotoFromPlant)(plant, decodeURIComponent(fileId));
+  if (plant) reporting('Couldn’t remove the photo', removePhotoFromPlant)(plant, decodeURIComponent(fileId));
 };
 
 // ── Draggable floor plan pins ──────────────────────────────────────────────
@@ -1169,12 +1177,13 @@ async function savePlantPosition(plantId, lat, lng) {
     const { changed } = await dbq(
       'UPDATE app_garden_viewer__plants SET lat = ?, lng = ?, updated_at = ?, version = version + 1 WHERE id = ?',
       [lat, lng, new Date().toISOString(), plantId]);
-    if (!changed) throw new Error('this plant is no longer in the garden.');
+    if (!changed) throw Object.assign(new Error('this plant is no longer in the garden.'), { forUser: true });
   } catch (e) {
     // The pin or marker has already been drawn where it was dropped. Put
     // everything back where the garden actually has it.
     renderMap();
-    await hubAlert(`Could not move the plant: ${e?.message ?? 'something went wrong.'}`);
+    if (!e?.forUser) console.error(e);
+    await hubAlert(e?.forUser ? `Couldn’t move the plant: ${e.message}` : 'Couldn’t move the plant — try again.');
     return;
   }
   const p = plants.find(pl => pl.id === plantId);
@@ -1273,7 +1282,7 @@ document.getElementById('addPlantModal').addEventListener('click', (e) => {
   if (e.target === e.currentTarget) window.closeAddPlantModal();
 });
 
-window.submitAddPlant = reporting('Could not add the plant', async () => {
+window.submitAddPlant = reporting('Couldn’t add the plant', async () => {
   const name = document.getElementById('plantNameInput').value.trim();
   const submit = document.getElementById('addPlantSubmitBtn');
   // The button is off while the write is in flight, so a second tap does not
@@ -1337,7 +1346,7 @@ window.updateCreateBtn = () => {
   document.getElementById('createGardenBtn').disabled = name.length === 0;
 };
 
-window.createGarden = reporting('Could not create the garden', async () => {
+window.createGarden = reporting('Couldn’t create the garden', async () => {
   const name = document.getElementById('gardenNameInput').value.trim();
   const gardenType = document.getElementById('gardenTypeInput').value;
   const create = document.getElementById('createGardenBtn');
