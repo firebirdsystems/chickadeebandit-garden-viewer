@@ -300,6 +300,11 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    .load-error { margin: 0 0 12px; padding: 10px 14px; border-radius: 10px; background: var(--hub-tint-danger, #fee2e2); color: var(--hub-tint-danger-fg, #b91c1c); font-size: 0.9rem; display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+    .load-error-retry { background: none; border: 1px solid currentColor; border-radius: 8px; padding: 5px 10px; font: inherit; font-weight: 600; color: inherit; cursor: pointer; flex-shrink: 0; }
+    body > .load-error { margin: 12px; }
+    .load-error[hidden] { display: none; }
+
     /* ── Responsive: mobile collapses list when detail is open ── */
     @media (max-width: 600px) {
       .plant-list { width: 100%; border-right: none; }
@@ -342,6 +347,8 @@
     </div>
   </div>
 </div>
+
+<div class="load-error" data-testid="load-error" role="alert" id="loadError" hidden><span>Couldn’t load your gardens.</span> <button type="button" class="load-error-retry" data-testid="load-retry">Try again</button></div>
 
 <!-- Placement banner -->
 <div class="placement-banner hidden" id="placementBanner">
@@ -557,8 +564,8 @@ async function loadGardens(withFirstPlants = false, selectId = null) {
 
 /** Controls that depend on who is looking and on there being a garden open. */
 function updateControls() {
-  document.getElementById('newGardenBtn').style.display = IS_ADULT ? '' : 'none';
-  document.getElementById('addPlantBtn').style.display = IS_ADULT && activeGardenId ? '' : 'none';
+  document.getElementById('newGardenBtn').style.display = IS_ADULT && !loadFailed ? '' : 'none';
+  document.getElementById('addPlantBtn').style.display = IS_ADULT && activeGardenId && !loadFailed ? '' : 'none';
 }
 
 // Each call takes the next number; an answer for a garden the member has
@@ -1390,26 +1397,37 @@ async function handleDeepLink() {
 
 // ── Boot ───────────────────────────────────────────────────────────────────
 
+// True from a failed first load until a load succeeds. While it is, the page
+// lists no gardens or plants and offers no way to add one.
+let loadFailed = false;
+
 async function init() {
   try {
     await initSchema();
     await loadGardens(true);
-    updateControls();
     await handleDeepLink();
+    loadFailed = false;
   } catch (e) {
     console.error('Garden viewer init failed:', e);
-    // Say so on the page: the console is not somewhere a member looks.
-    document.getElementById('plantList').innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">${chickadee('perched')}</div>
-        <div class="empty-title">The garden couldn't load.</div>
-        <div class="empty-msg">${esc(e?.message ?? 'Something went wrong.')}</div>
-        <button class="add-plant-btn" style="margin-top:14px" onclick="window.location.reload()">Try again</button>
-      </div>`;
+    loadFailed = true;
+    gardenLoadSeq++;
+    gardens = [];
+    plants = [];
+    activeGardenId = null;
+    document.getElementById('gardenSelect').innerHTML = '';
+    document.getElementById('plantList').innerHTML = '';
   } finally {
     document.getElementById('loading').style.display = 'none';
+    // Say so on the page: the console is not somewhere a member looks.
+    document.getElementById('loadError').hidden = !loadFailed;
+    updateControls();
   }
 }
+
+document.querySelector('[data-testid="load-retry"]').addEventListener('click', () => {
+  document.getElementById('loading').style.display = '';
+  init();
+});
 
 init();
 </script>
