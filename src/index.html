@@ -421,7 +421,7 @@ import { esc, isAdult, createDbHelper, createFilesHelper, hubAlert, hubConfirm, 
 document.getElementById('toolbarGlyph').innerHTML = glyph('sprout');
 window.plantGlyph = () => glyph('sprout');
 window.plantMarkerGlyph = () => glyph('sprout', { color: '#fff', accent: '#fff' });
-import { searchableFields, parsePhotoThumbs, parsePhotoIds, tilePhotoId, photoThumbsFor, hasPosition, failureLine, uploadFailureLine } from "./logic.js";
+import { searchableFields, parsePhotoThumbs, parsePhotoIds, tilePhotoId, photoThumbsFor, hasPosition, failureLine, uploadFailureLine, outcomeUnknown } from "./logic.js";
 
 // ── State ──────────────────────────────────────────────────────────────────
 
@@ -961,14 +961,30 @@ async function addPhotoToPlant(plant, file) {
   // No row has taken a reference to these bytes yet, and nothing sweeps
   // unreferenced files — an upload abandoned here would count against the
   // household's storage quota permanently, invisible to everyone. Undo it
-  // whether the write was turned away or failed outright.
+  // when the write was turned away. Not when its answer was lost (no status,
+  // a 400, a 5xx other than 507): the plant may have stored the photo, and
+  // deleting the file would leave it naming bytes that are gone.
   let written = false;
   try {
     written = await writePhotoUrls(plant, updated, newThumbs);
-  } finally {
-    if (!written) await files.delete(result.id).catch(() => {});
+  } catch (e) {
+    if (!outcomeUnknown(e)) { await files.delete(result.id).catch(() => {}); throw e; }
+    // Read the plant back: the photo in its list means the write landed, and
+    // the success path below runs once. Not there, or the read failed: the
+    // usual failure line, and the file is left alone.
+    let fresh = null;
+    try {
+      const { rows } = await dbq(`SELECT * FROM app_garden_viewer__plants WHERE id = ?`, [plant.id]);
+      fresh = rows?.[0] ? readPlant(rows[0]) : null;
+    } catch (readErr) { console.error(readErr); }
+    if (!fresh?.photo_file_ids.includes(result.id)) throw e;
+    console.error(e);
+    plant.photo_file_ids = fresh.photo_file_ids;
+    plant.photo_thumbs = fresh.photo_thumbs;
+    plant.version = fresh.version;
+    written = true;
   }
-  if (!written) return;
+  if (!written) { await files.delete(result.id).catch(() => {}); return; }
   await recordChange('plants', plant.id);
   // Redraw the plant only if the member is still looking at it.
   if (selectedPlantId === plant.id) selectPlant(plant.id);
@@ -1057,8 +1073,11 @@ async function uploadFloorPlan(garden, file) {
   // referencing a plan whose bytes had already been deleted.
   //
   // The write is not guaranteed to land — the garden may have been deleted
-  // from another device mid-upload — so both failure paths delete the freshly
-  // uploaded bytes. Nothing else ever would: no row names them.
+  // from another device mid-upload — so a write that was turned away deletes
+  // the freshly uploaded bytes. Nothing else ever would: no row names them.
+  // Not when its answer was lost (no status, a 400, a 5xx other than 507):
+  // the garden may have stored the plan, and deleting the file would leave it
+  // naming bytes that are gone.
   let changed;
   try {
     // `version` moves with every write: the companion app writes this row
@@ -1067,12 +1086,30 @@ async function uploadFloorPlan(garden, file) {
       `UPDATE app_garden_viewer__gardens SET plan_file_id = ?, updated_at = ?, version = version + 1 WHERE id = ?`,
       [result.id, new Date().toISOString(), garden.id]));
   } catch (e) {
-    await files.delete(result.id).catch(() => {});
-    throw e;
+    if (!outcomeUnknown(e)) { await files.delete(result.id).catch(() => {}); throw e; }
+    // Read the garden back: the new plan named there means the write landed,
+    // and the success path below runs once. Not named, or the read failed:
+    // the usual failure line, and the file is left alone.
+    let stored = null;
+    try {
+      const { rows } = await dbq(`SELECT plan_file_id FROM app_garden_viewer__gardens WHERE id = ?`, [garden.id]);
+      stored = rows?.[0] ?? null;
+    } catch (readErr) { console.error(readErr); }
+    if (stored?.plan_file_id !== result.id) throw e;
+    console.error(e);
+    changed = 1;
   }
   if (!changed) {
+    // Nothing stored names the new file, so it goes. Re-read to say why: gone,
+    // or still there (the row policy kept this member's plain `WHERE id = ?`
+    // write from it). The read failed: unknown.
     await files.delete(result.id).catch(() => {});
-    await hubAlert('This garden was removed while the floor plan was uploading.');
+    let found = null;
+    try { found = !!(await dbq(`SELECT id FROM app_garden_viewer__gardens WHERE id = ?`, [garden.id])).rows?.[0]; }
+    catch (readErr) { console.error(readErr); }
+    await hubAlert(found === false
+      ? 'This garden was removed while the floor plan was uploading.'
+      : failureLine(null, { action: 'upload the floor plan', thing: 'garden', found }));
     return;
   }
   garden.plan_file_id = result.id;
