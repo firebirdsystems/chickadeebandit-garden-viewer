@@ -2,7 +2,7 @@
  * Local mirror of the hub's scalar-file-column ratchet.
  *
  * Every column holding a hub file id must be named by
- * `manifest.delete_file_columns`, so the hub reads the id off the doomed row
+ * `manifest.file_columns.<table>.columns`, so the hub reads the id off the doomed row
  * and queues the R2 reclaim inside the DELETE's own transaction. The pattern
  * this replaces was a trailing `files.delete(id).catch(() => {})` in the
  * client, fired after the row was already gone: when it was interrupted the
@@ -12,7 +12,7 @@
  *
  * `delete_cascades` does NOT satisfy this. That key fires when the PARENT is
  * deleted; a direct DELETE of the row that owns the file consults
- * `delete_file_columns` and nothing else.
+ * `file_columns` and nothing else.
  *
  * The hub rejects the bundle at publish time. This test is the same check where
  * it is cheap to fix.
@@ -97,7 +97,8 @@ function schemaFileColumns() {
   return found;
 }
 
-/** Tables/columns whose deletes reclaim durably: delete_file_columns, plus
+/** Tables/columns whose deletes reclaim durably: file_columns (one entry covers both the delete
+ *  and update lanes), plus
  *  versioned_records (that lane reclaims through the countersigned purge). */
 function declaredColumns() {
   const declared = new Map();
@@ -107,7 +108,7 @@ function declaredColumns() {
     declared.set(table, set);
     for (const column of [columns].flat().filter(Boolean)) set.add(column);
   };
-  for (const [table, columns] of Object.entries(manifest.delete_file_columns ?? {})) add(table, columns);
+  for (const [table, entry] of Object.entries(manifest.file_columns ?? {})) add(table, entry.columns);
   for (const cfg of Object.values(manifest.versioned_records ?? {})) {
     add(cfg.table, cfg.file_column);
     add(cfg.version_table, cfg.file_column);
@@ -126,9 +127,9 @@ describe("hub file reclaim", () => {
 
   it("names only real tables and columns", () => {
     const tables = appTableColumns();
-    for (const [table, columns] of Object.entries(manifest.delete_file_columns ?? {})) {
+    for (const [table, { columns = [] }] of Object.entries(manifest.file_columns ?? {})) {
       const names = tables.get(`${prefix}${table}`);
-      expect(names, `delete_file_columns.${table} has no CREATE TABLE`).toBeDefined();
+      expect(names, `file_columns.${table} has no CREATE TABLE`).toBeDefined();
       // The engine resolves the doomed rows by id before deleting them.
       expect(names.has("id"), `${table} needs an id column`).toBe(true);
       for (const column of columns) {
@@ -152,21 +153,24 @@ import { readFileSync as _read } from "fs";
 const clientSrc = _read(new URL("../src/index.html", import.meta.url), "utf-8");
 
 describe("file ids, not URLs", () => {
+  // One `file_columns` entry now covers both app-originated lanes — the UPDATE
+  // that replaces a plan or drops a photo, and the DELETE of the row — so the
+  // former separate update/delete keys are asserted as this one declaration.
   it("declares both unlink lanes: replacing a plan, and dropping a photo", () => {
-    expect(manifest.update_file_columns?.gardens).toContain("plan_file_id");
-    expect(manifest.update_file_list_columns?.plants).toContain("photo_file_ids");
+    expect(manifest.file_columns?.gardens?.columns).toContain("plan_file_id");
+    expect(manifest.file_columns?.plants?.list_columns).toContain("photo_file_ids");
   });
 
-  it("declares the delete lanes too — they are independent of the update ones", () => {
-    expect(manifest.delete_file_columns?.gardens).toContain("plan_file_id");
-    expect(manifest.delete_file_list_columns?.plants).toContain("photo_file_ids");
+  it("declares the plan as a scalar column and the photos as a list column", () => {
+    // The two kinds are read differently (raw SQL vs codec-decoded JSON array).
+    expect(manifest.file_columns?.gardens?.list_columns ?? []).not.toContain("plan_file_id");
+    expect(manifest.file_columns?.plants?.columns ?? []).not.toContain("photo_file_ids");
   });
 
   it("leaves the small copies to the hub: photo_thumbs is in no file key", () => {
     // A small copy is deleted with its photo, so the map is not a file column.
-    for (const key of ["update_file_columns", "update_file_list_columns", "delete_file_columns", "delete_file_list_columns"]) {
-      expect(manifest[key]?.plants ?? []).not.toContain("photo_thumbs");
-    }
+    const plants = manifest.file_columns?.plants ?? {};
+    expect([...(plants.columns ?? []), ...(plants.list_columns ?? [])]).not.toContain("photo_thumbs");
   });
 
   it("writes photo_thumbs in every statement that writes the photo list", () => {

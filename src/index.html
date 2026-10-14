@@ -421,7 +421,7 @@ import { esc, isAdult, createDbHelper, createFilesHelper, hubAlert, hubConfirm, 
 document.getElementById('toolbarGlyph').innerHTML = glyph('sprout');
 window.plantGlyph = () => glyph('sprout');
 window.plantMarkerGlyph = () => glyph('sprout', { color: '#fff', accent: '#fff' });
-import { searchableFields, parsePhotoThumbs, parsePhotoIds, tilePhotoId, photoThumbsFor, hasPosition } from "./logic.js";
+import { searchableFields, parsePhotoThumbs, parsePhotoIds, tilePhotoId, photoThumbsFor, hasPosition, failureLine, uploadFailureLine } from "./logic.js";
 
 // ── State ──────────────────────────────────────────────────────────────────
 
@@ -506,17 +506,17 @@ async function recordChange(entityType, entityId, operation = 'upsert') {
 }
 
 /** Runs a member's action and tells them if it fails, instead of leaving the
- *  failure as an unhandled rejection nobody sees. Only this page's own wording
- *  (`forUser`) and a refused upload (`uploadRefusal`: too large, wrong type,
- *  storage full) are shown; any other error is logged and gets the fixed line. */
-function reporting(what, fn) {
+ *  failure as an unhandled rejection nobody sees. `words` are the action's own
+ *  nouns ({ action: "add the photo", thing: "photo" }); the line comes from the
+ *  error's status (failureLine, or uploadFailureLine for the upload itself),
+ *  never from the hub's text. The error goes to the console. */
+function reporting(words, fn) {
   return async (...args) => {
     try {
       return await fn(...args);
     } catch (e) {
-      if ((e?.forUser || e?.uploadRefusal) && e.message) { await hubAlert(`${what}: ${e.message}`); return; }
       console.error(e);
-      await hubAlert(`${what} — try again.`);
+      await hubAlert(e?.fromUpload ? uploadFailureLine(e, words) : failureLine(e, words));
     }
   };
 }
@@ -560,7 +560,7 @@ async function loadGardens(withFirstPlants = false, selectId = null) {
     opt.textContent = g.name;
     sel.appendChild(opt);
   });
-  sel.onchange = reporting('Couldn’t open that garden', () => selectGarden(sel.value));
+  sel.onchange = reporting({ action: 'open that garden', thing: 'garden' }, () => selectGarden(sel.value));
   // Awaited, so a caller that goes on to use `plants` (the deep link) sees them.
   const target = selectId && rows.some(g => g.id === selectId) ? selectId : rows[0].id;
   await selectGarden(target, target === rows[0].id ? firstPlants : null);
@@ -943,8 +943,8 @@ async function uploadWithProgress(file, label, options = {}) {
     });
     return result; // { id, url, thumbnailId? }
   } catch (e) {
-    // The hub's reason for turning an upload away is one the member can act on.
-    if (e && typeof e === 'object') e.uploadRefusal = true;
+    // The upload's own refusals (too large, wrong type) have lines of their own.
+    if (e && typeof e === 'object') e.fromUpload = true;
     throw e;
   } finally {
     bar.style.display = 'none';
@@ -1094,7 +1094,7 @@ document.getElementById('photo-input').addEventListener('change', async (e) => {
   e.target.value = '';
   const plant = _uploadTargetPlant;
   _uploadTargetPlant = null;
-  if (file && plant) await reporting('Couldn’t add the photo', addPhotoToPlant)(plant, file);
+  if (file && plant) await reporting({ action: 'add the photo', thing: 'photo' }, addPhotoToPlant)(plant, file);
 });
 
 document.getElementById('plan-input').addEventListener('change', async (e) => {
@@ -1102,7 +1102,7 @@ document.getElementById('plan-input').addEventListener('change', async (e) => {
   e.target.value = '';
   const garden = _uploadTargetGarden;
   _uploadTargetGarden = null;
-  if (file && garden) await reporting('Couldn’t upload the floor plan', uploadFloorPlan)(garden, file);
+  if (file && garden) await reporting({ action: 'upload the floor plan', thing: 'floor plan' }, uploadFloorPlan)(garden, file);
 });
 
 window.triggerPhotoUpload = (plantId) => {
@@ -1117,7 +1117,7 @@ window.triggerPlanUpload = (gardenId) => {
 
 window.removePhoto = (plantId, fileId) => {
   const plant = plants.find(p => p.id === plantId);
-  if (plant) reporting('Couldn’t remove the photo', removePhotoFromPlant)(plant, decodeURIComponent(fileId));
+  if (plant) reporting({ action: 'remove the photo', thing: 'photo' }, removePhotoFromPlant)(plant, decodeURIComponent(fileId));
 };
 
 // ── Draggable floor plan pins ──────────────────────────────────────────────
@@ -1183,7 +1183,7 @@ async function savePlantPosition(plantId, lat, lng) {
     // everything back where the garden actually has it.
     renderMap();
     if (!e?.forUser) console.error(e);
-    await hubAlert(e?.forUser ? `Couldn’t move the plant: ${e.message}` : 'Couldn’t move the plant — try again.');
+    await hubAlert(e?.forUser ? `Couldn’t move the plant: ${e.message}` : failureLine(e, { action: 'move the plant', thing: 'plant' }));
     return;
   }
   const p = plants.find(pl => pl.id === plantId);
@@ -1282,7 +1282,7 @@ document.getElementById('addPlantModal').addEventListener('click', (e) => {
   if (e.target === e.currentTarget) window.closeAddPlantModal();
 });
 
-window.submitAddPlant = reporting('Couldn’t add the plant', async () => {
+window.submitAddPlant = reporting({ action: 'add the plant', thing: 'plant' }, async () => {
   const name = document.getElementById('plantNameInput').value.trim();
   const submit = document.getElementById('addPlantSubmitBtn');
   // The button is off while the write is in flight, so a second tap does not
@@ -1346,7 +1346,7 @@ window.updateCreateBtn = () => {
   document.getElementById('createGardenBtn').disabled = name.length === 0;
 };
 
-window.createGarden = reporting('Couldn’t create the garden', async () => {
+window.createGarden = reporting({ action: 'create the garden', thing: 'garden' }, async () => {
   const name = document.getElementById('gardenNameInput').value.trim();
   const gardenType = document.getElementById('gardenTypeInput').value;
   const create = document.getElementById('createGardenBtn');
