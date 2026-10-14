@@ -57,7 +57,6 @@
     "https://unpkg.com"
   ],
   "resource_limits": {
-    "max_db_bytes": 52428800,
     "max_file_bytes": 15728640,
     "max_files_bytes": 524288000
   },
@@ -134,11 +133,6 @@
     },
     "garden_activity": {
       "kind": "adult_writable",
-      "retain_days": {
-        "default": 365,
-        "timestamp_column": "created_at",
-        "override_key": "activity_history"
-      },
       "column_write_acls": {
         "actor_id": {
           "writable_by": [
@@ -153,33 +147,24 @@
     },
     "changes": {
       "kind": "endpoint_only",
-      "read": "everyone",
-      "retain_days": {
-        "default": 365,
-        "timestamp_column": "changed_at",
-        "override_key": "sync_ledger"
-      }
+      "read": "everyone"
     }
   },
-  "update_file_columns": {
-    "gardens": [
-      "plan_file_id"
-    ]
+  "retention": {
+    "garden_activity": {
+      "default": 365,
+      "timestamp_column": "created_at",
+      "override_key": "activity_history"
+    },
+    "changes": {
+      "default": 365,
+      "timestamp_column": "changed_at",
+      "override_key": "sync_ledger"
+    }
   },
-  "update_file_list_columns": {
-    "plants": [
-      "photo_file_ids"
-    ]
-  },
-  "delete_file_columns": {
-    "gardens": [
-      "plan_file_id"
-    ]
-  },
-  "delete_file_list_columns": {
-    "plants": [
-      "photo_file_ids"
-    ]
+  "file_columns": {
+    "gardens": { "columns": ["plan_file_id"] },
+    "plants": { "list_columns": ["photo_file_ids"] }
   },
   "file_acls": {
     "write": {
